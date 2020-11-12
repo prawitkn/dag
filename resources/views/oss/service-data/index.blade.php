@@ -1,4 +1,4 @@
-@extends('layouts.onlineStoreLayout.design')
+@extends('layouts.dagSchoolLayout.design')
 @section('head')
 <!-- datatable js -->
 <!-- <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script> -->
@@ -23,8 +23,7 @@
   <div class="container-fluid">
     <ul class="breadcrumb">
       <li class="breadcrumb-item"><a href="{{ url('/online_store') }}">หน้าแรก</a></li>
-      <li class="breadcrumb-item">ลูกค้า</li>
-      <li class="breadcrumb-item active">สาขา</li>
+      <li class="breadcrumb-item active">นักเรียน</li>
     </ul>
   </div>
 </div>
@@ -49,13 +48,26 @@
       
     <!-- Page Header-->
     <header> 
-      <h1 class="display">รายการสาขาของ {{ $customer->customer_name }}
-	  &nbsp;<a href="{{ url('online_store/customers/new') }}" class="btn btn-primary shadow rounded" name="btn_add" /> เพิ่ม</a>
+      <h1 class="display">รายการนักเรียน
+	 <!--  &nbsp;<a href="{{ url('online_store/customers/new') }}" class="btn btn-primary shadow rounded" name="btn_add" /> เพิ่ม</a> -->
       </h1>
       
 
     </header>
     <!-- Page Header-->
+
+    <div class="row">
+      <div class="col-md-12">
+        หลักสูตร : 
+        <select class="form-control">
+          <option value=""> - Select - </option>
+          @foreach($program_student_headers as $val)
+            <option value="{{$val->id}}">{{$val->program_student_name}}</option>
+          @endforeach
+        </select>
+      </div>
+    </div>
+
     <div class="row">
       <div class="col-md-12">
 
@@ -64,10 +76,10 @@
 	        <thead>
 	            <tr>
 	                <th class="col_no" style="text-align: center;" >ลำดับ</th>
-                  <th class="col_code" style="text-align: center;" >รหัสสาขา</th>
-                  <th class="col_name" style="text-align: center;" >ชื่อสาขา</th>
+                  <th class="col_name" style="text-align: center;" >ยศ ชื่อ นามสกุล</th>
+                  <th class="col_org_name" style="text-align: center;" >หน่วย</th>
 	                <th class="col_status" style="text-align: center;" >สถานะ</th>
-	                <th class="col_action" style="text-align: center;" >#</th>
+	                <th class="col_action" style="text-align: center;" >การปฏิบัติ</th>
 	            </tr>
 	        </thead>
 	    </table>
@@ -110,14 +122,14 @@ $(document).ready(function(){
                 fixedHeader: true,
                 ajax: {
                     type: 'GET',
-                    url: "{{ url('online_store/ship_to_customers/list') }}/{{$customer->id}}",
+                    url: "{{ url('dag_school/program-student/list') }}",
                     dataSrc: 'items',
                 },
                 autoWidth: false,
                 columns: [
                     { data: null },
-                    { data: 'ship_to_coded' },
-                    { data: 'ship_to_name' },
+                    { data: 'customer_name' },
+                    { data: 'org_name' },
                     { data: null },
                     { data: null }
                 ],
@@ -139,7 +151,7 @@ $(document).ready(function(){
                     {   targets: 'col_action',
                         className: 'dt-center',
                          render: function (data, type, row, meta) {
-                          var tmp = '<a name="" href="{{ url('online_store/customers/edit/') }}/'+row.id+'" class="btn btn-primary btn-mini rounded" data-ref_id="'+row.id+'" href="#" ><i class="fa fa-edit"></i> แก้ไข</a> ';
+                          var tmp = '<a name="" href="{{ url('dags/students/edit/') }}/'+row.id+'" class="btn btn-primary btn-mini rounded" data-ref_id="'+row.id+'" href="#" ><i class="fa fa-edit"></i> แก้ไข</a>';
                             return tmp;
                          }
                      }

@@ -1,4 +1,4 @@
-@extends('layouts.onlineStoreLayout.design')
+@extends('layouts.dagSchoolLayout.design')
 
 @section('head')
 <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
@@ -12,7 +12,7 @@
   <div class="container-fluid">
     <ul class="breadcrumb">
       <li class="breadcrumb-item"><a href="{{ url('/online_store') }}">หน้าแรก</a></li>
-      <li class="breadcrumb-item active">ลูกค้า</li>
+      <li class="breadcrumb-item active">นักเรียน</li>
     </ul>
   </div>
 </div>
@@ -22,7 +22,7 @@
   <div class="container-fluid">
     <!-- Page Header-->
     <header> 
-      <h1 class="display">ลูกค้า : <b>{{ $customer->customer_name }}</b>
+      <h1 class="display">นักเรียน : <b>{{ $customer->customer_name }}</b>
       </h1>
       
 
@@ -50,8 +50,13 @@
         <div class="row">
 
           <div class="form-group col-md-6">
-            <label for="customer_name">ชื่อลูกค้า</label>
+            <label for="customer_name">ยศ ชื่อ นามสกุล</label>
             <input type="text" class="form-control" name="customer_name" value="{{ $customer->customer_name }}" required >
+          </div><!--/.col-6-->
+
+          <div class="form-group col-md-6">
+            <label for="org_name">หน่วย</label>
+            <input type="text" class="form-control" name="org_name" value="{{ $customer->org_name }}" required >
           </div><!--/.col-6-->
 
         </div><!--/row-->
@@ -127,6 +132,7 @@ $(document).ready(function(){
   })
 
   function formClear(){
+    $('input[name="org_name"]').val('');
     $('input[name="customer_name"]').val('');
 
     $('input[name="customer_name"]').select();
@@ -150,7 +156,7 @@ $(document).ready(function(){
           headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
       }); 
       $.ajax({
-        url: "{{ url('/online_store/customers/update') }}",
+        url: "{{ url('/dags/students/update') }}",
         type: 'post', dataType:"json", data: params,
         success: function (res) { 
             console.log(res);
