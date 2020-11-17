@@ -80,10 +80,14 @@ Route::group(['middleware' => 'auth'], function(){
 
 
 
-	// OSS
+	// OSS	
+	Route::get('oss','OssServiceDataController@new');
 	Route::get('oss/service_topics/list-by-service_type','OssServiceDataController@list_by_service_type');
 
 	// Service data
 	Route::get('oss/service-data/new','OssServiceDataController@new');
 	Route::post('oss/service-data/create','OssServiceDataController@create');
+	Route::get('oss/service-data/report','OssServiceDataController@view_report');
+	Route::get('oss/service-data/get-report_summary','OssServiceDataController@report_summary');
+	Route::get('oss/service-data/get-report_summary_pdf','OssServiceDataController@report_summary_pdf');
 });

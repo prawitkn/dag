@@ -2,8 +2,8 @@
     <nav class="navbar">
       <div class="container-fluid">
         <div class="navbar-holder d-flex align-items-center justify-content-between">
-          <div class="navbar-header"><a id="toggle-btn" href="#" class="menu-btn"><i class="icon-bars"> </i></a><a href="{{ url('online_store') }}" class="navbar-brand">
-              <div class="brand-text d-none d-md-inline-block"><span></span><strong class="text-primary">Online Store</strong></div></a>
+          <div class="navbar-header"><a id="toggle-btn" href="#" class="menu-btn"><i class="icon-bars"> </i></a><a href="{{ url('oss') }}" class="navbar-brand">
+              <div class="brand-text d-none d-md-inline-block"><span></span><strong class="text-primary">ศูนย์บริการแบบเบ็ดเสร็จ บก.ทท.</strong></div></a>
 					</div>
 			
 		  

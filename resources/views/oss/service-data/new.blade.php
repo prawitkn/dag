@@ -35,7 +35,16 @@
           <input type="hidden" id="id" value="" />
         
             <div class="row">
-              <div class="col-md-3">
+              <div class="form-group col-md-2">
+                <div class="form-group-material">
+                  <input  type="text" name="issue_date" required class="input-material datepicker" data-format="yyyy-mm-dd" placeholder="">
+                  <label for="issue_date" class="label-material active">วันที่</label>
+                </div>
+                <!--/.form-group-material-->
+              </div>
+              <!--/.col-->
+
+              <div class="col-md-4">
                 <select name="service_type_name" class="form-control" required>
                   <option value=""> ประเภทการให้บริการ </option>
                   @foreach($service_types as $val)
@@ -45,9 +54,8 @@
                 <input type="hidden" name="service_type_id" value="" />
               </div>
 
-
-              <div class="col-md-3">
-                <select name="service_topic_name" class="form-control" required>
+              <div class="col-md-4">
+                <select name="service_topic_name" class="form-control" >
                   <option value=""> หัวข้อการให้บริการ </option>
                   @foreach($service_types as $val)
                     <option value="{{$val->id}}">{{$val->service_topic_name }}</option>
@@ -56,12 +64,26 @@
                 <input type="hidden" name="service_topic_id" value="" />
               </div>
 
+              <div class="col-md-2">
+                <select name="customer_type_name" class="form-control" required>
+                  <option value=""> ผู้ขอรับริการ </option>
+                  @foreach($customer_types as $val)
+                    <option value="{{$val->id}}">{{$val->customer_type_name }}</option>
+                  @endforeach
+                </select>
+                <input type="hidden" name="customer_type_id" value="" />
+              </div>
+
+            </div><!--/row-->
+
+            <div class="row">
+
               <div class="col-md-6">
                 <label for="remark">อื่น ๆ</label>
                 <textarea name="remark" class="form-control"></textarea>
               </div><!--/.col-6-->
-
-            </div><!--/row-->
+              
+            </div>
       
         </div>
         <!--/.card-body-->
@@ -118,10 +140,27 @@
     }
 </style>
 
+<link href="{{ asset('public/assets/libs/bootstrap-datepicker-custom-thai/dist/css/bootstrap-datepicker.css') }}" rel="stylesheet" />
+<script src="{{ asset('public/assets/libs/bootstrap-datepicker-custom-thai/dist/js/bootstrap-datepicker-custom.js') }}"></script>
+<script src="{{ asset('public/assets/libs/bootstrap-datepicker-custom-thai/dist/locales/bootstrap-datepicker.th.min.js') }}" charset="UTF-8"></script>
+
+
+
 <!-- Set default evaluator -->
 <script type="text/javascript">
 
 $(document).ready(function(){ 
+  $('.datepicker').datepicker({
+        daysOfWeekHighlighted: "0,6",
+        autoclose: true,
+        format: 'dd/mm/yyyy',
+        todayBtn: true,
+        minDate: '01/01/2020',
+        language: 'en',             //เปลี่ยน label ต่างของ ปฏิทิน ให้เป็น ภาษาไทย   (ต้องใช้ไฟล์ bootstrap-datepicker.th.min.js นี้ด้วย)
+        thaiyear: false              //Set เป็นปี พ.ศ.
+    });  
+        //กำหนดเป็นวันปัจุบัน
+    $('.datepicker').datepicker('setDate', '0');
 
   function formClear(){
     $('input[name="customer_name"]').val('');
@@ -212,6 +251,11 @@ $(document).ready(function(){
      $('select[name="service_topic_name"]').on('change', function() { 
       // alert($(this).val());
       $('input[name="service_topic_id"]').val($(this).val());
+    });
+
+     $('select[name="customer_type_name"]').on('change', function() { 
+      // alert($(this).val());
+      $('input[name="customer_type_id"]').val($(this).val());
     });
 });
 

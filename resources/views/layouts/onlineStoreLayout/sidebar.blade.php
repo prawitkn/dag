@@ -8,13 +8,14 @@
         <h2 class="h5">{{ Auth::user()->name }}</h2><span>...</span>
       </div>
       <!-- Small Brand information, appears on minimized sidebar-->
-      <div class="sidenav-header-logo"><a href="index.html" class="brand-small text-center"> <strong>A</strong><strong class="text-primary">Best</strong></a></div>
+      <div class="sidenav-header-logo"><a href="index.html" class="brand-small text-center"> <strong></strong><strong class="text-primary">สบ.</strong></a></div>
     </div>
     <!-- Sidebar Navigation Menus-->
     <div class="main-menu">
     	<ul id="side-main-menu" class="side-menu list-unstyled">  
         @if(Auth::user()->isAdmin())
-          <li><a href="{{ url('/online_store') }}"> <i class="icon-home"></i>หน้าแรก</a></li>
+          <li><a href="{{ url('/oss/service-data/new') }}"> <i class="icon-home"></i>หน้าแรก</a></li>
+          <li><a href="{{ url('/oss/service-data/report') }}"> <i class="icon-home"></i>รายงาน</a></li>
         @endif       
         @if(Auth::user()->isOnlineStoreSalesAdmin())
           <li><a href="{{ url('/online_store/dashboard') }}"> <i class="icon-home"></i>หน้าแรก</a></li>
