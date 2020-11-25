@@ -104,7 +104,7 @@
 
           <div class="card-footer">
             <div class="col-12 d-flex no-block align-items-center">
-              <a href="#" name="btn_excel" class="btn btn-primary rounded shadow" /> นำออกข้อมูล (.xlsx)</a>
+             <!--  <a href="#" name="btn_excel" class="btn btn-primary rounded shadow" /> นำออกข้อมูล (.xlsx)</a> -->
               <a href="#" name="btn_pdf" class="btn btn-primary rounded shadow" /> นำออกข้อมูล (.pdf)</a>
                 <div class="ml-auto text-right">
         <!--     <a href="#" name="btn_clear" class="btn btn-secondary rounded shadow" /> ล้างข้อมุล</a>
@@ -232,6 +232,10 @@ $(document).ready(function(){
                       width: 500,
                       className: 'dt-center',
                    }, 
+                  {   targets: 'col_name',
+                      width: 500,
+                      className: 'dt-center',
+                   }, 
               ]
           } );
       }    
@@ -242,7 +246,7 @@ $(document).ready(function(){
     var $issue_date = $('input[name="issue_date"]').val();
     var $issue_date_to = $('input[name="issue_date_to"]').val();
        
-    location.href='{{url('/oss/service-data/get-report_summary_pdf')}}?issue_date='+$issue_date+'&issue_date_to='+$issue_date_to;
+    window.open('{{url('/oss/service-data/get-report_summary_pdf')}}?issue_date='+$issue_date+'&issue_date_to='+$issue_date_to);
 
   });
 

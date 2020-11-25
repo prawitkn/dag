@@ -163,7 +163,14 @@ $(document).ready(function(){
     $('.datepicker').datepicker('setDate', '0');
 
   function formClear(){
-    $('input[name="customer_name"]').val('');
+    $('textarea[name="remark"]').val('');
+    $('select[name="customer_type_name"]').val('');
+    $('input[name="customer_type_id"]').val('');
+    $('select[name="service_topic_name"]').val('');
+    $('input[name="service_topic_id"]').val('');
+    $('select[name="service_type_name"]').val('');
+    $('input[name="service_type_id"]').val('');
+    $('.datepicker').datepicker('setDate', '0');
 
     $('input[name="customer_name"]').select();
   }
@@ -256,6 +263,7 @@ $(document).ready(function(){
      $('select[name="customer_type_name"]').on('change', function() { 
       // alert($(this).val());
       $('input[name="customer_type_id"]').val($(this).val());
+      $('input[name="service_topic_id"]').val('');
     });
 });
 
