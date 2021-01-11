@@ -28,7 +28,7 @@ class DagsProgramClassTestStudentController extends Controller
     		$tests = DB::select('select b.course_name
     			, c.id, c.program_course_test_name, c.score 
     			FROM dags_program_classes as a
-    			join dags_program_courses as b ON b.program_id=a.program_id
+    			join dags_program_courses as b ON b.program_id=a.program_id AND b.is_calc=1 
     			join dags_program_course_tests as c ON c.program_course_id=b.id 
     			WHERE a.status=1 
     			AND a.id='.$req['class_id']);

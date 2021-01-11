@@ -345,14 +345,8 @@ class DagSchoolController extends Controller
             //
             PDF::SetFont('freeserif', '', 10, '', true);
             PDF::Cell(0, 5, PDF::getAliasNumPage().'/'.PDF::getAliasNbPages(), 0, false, 'R', 0, '', 0, false, 'T', 'M');
-            
-            // PDF::SetFont('freeserif', 'B', 16, '', true);       
-            // PDF::SetY(11);  
-            // PDF::Cell(0, 5, $header->program_class_name, 0, false, 'C', 0, '', 0, false, 'M', 'M');
-            PDF::Ln(7);
-            // PDF::SetFont('freeserif', 'B', 14, '', true);   
-            // PDF::Cell(0, 5, 'Sending', 0, false, 'C', 0, '', 0, false, 'M', 'M');
-            //
+
+            PDF::Ln();
 
             PDF::SetTitle($header->program_class_name);
             $html='';
@@ -365,7 +359,7 @@ class DagSchoolController extends Controller
                     PDF::AddPage('P', 'A4');
                     PDF::SetFont('freeserif', '', 12, '', true);
                     // PDF::Cell(0, 5, PDF::getAliasNumPage().'/'.PDF::getAliasNbPages(), 0, false, 'R', 0, '', 0, false, 'T', 'M');                
-                    PDF::Ln(7);
+                    PDF::Ln();
                     $x=$y=0;
 
                 //$pdf->writeHTMLCell(0, 0, '', '', $html, 0, 1, 0, true, '', true);
@@ -375,73 +369,117 @@ class DagSchoolController extends Controller
 
                 $isBorder = 0; // 1 for coding alingment, 0 for Production
                 
-                $x=2;
-                $yHeight=10;
-                $y+=5;
-                PDF::writeHTMLCell(200, $yHeight, $x, $y, '<h1 style="text-align: center; font-size: 200%;">'.'แบบรายงานผลการฝึกอบรมเฉพาะบุคคล'.'</h1>', $border = $isBorder, $ln = 0, $align = '', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M' );
+                $x=10;
+                $yHeight=8;
+                $y+=10;
+                PDF::writeHTMLCell(190, $yHeight, $x, $y, '<h3 style="text-align: center;">'.'แบบรายงานผลการฝึกอบรมเฉพาะบุคคล'.'</h3>', $border = $isBorder, $ln = 0, $align = '', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M' );
                 $y+=$yHeight;   // new line
 
-                $x=2;              
+                $x=20;              
                 PDF::writeHTMLCell(200, $yHeight, $x, $y, '<b style="text-align: left;">การฝึกอบรม </b>'.$header->program_class_name, $border = $isBorder, $ln = 0, $align = '', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M' ); 
                 $y+=$yHeight;   // new line
 
-                $x=2;              
-                PDF::writeHTMLCell(140, $yHeight, $x, $y, '<b style="text-align: left;">ยศ-ชื่อ-สกุล </b>'.$class_student->class_student_id.'-'.$class_student->student_name, $border = $isBorder, $ln = 0, $align = '', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M' ); 
-                $x+=140; 
+                $x=20;              
+                PDF::writeHTMLCell(120, $yHeight, $x, $y, '<b style="text-align: left;">ยศ-ชื่อ-สกุล </b>'.$class_student->student_name, $border = $isBorder, $ln = 0, $align = '', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M' ); 
+                $x+=120; 
 
-                PDF::writeHTMLCell(40, $yHeight, $x, $y, '<b style="text-align: left;">สังกัด </b>'.$class_student->org_name, $border = $isBorder, $ln = 0, $align = '', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M' ); 
+                PDF::writeHTMLCell(60, $yHeight, $x, $y, '<b style="text-align: left;">สังกัด </b>'.$class_student->org_name, $border = $isBorder, $ln = 0, $align = '', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M' ); 
                 } // rowPerPage
-                PDF::Ln(7);
+                $y+=$yHeight;   // new line
+
+
+                
+                $x=20;              
+                PDF::writeHTMLCell(200, $yHeight, $x, $y, '<b style="text-align: left;"><span style="text-decoration-line: underline;">ตอนที่ 1</span> : เวลาเข้ารับการอบรม คิดเป็นร้อยละ 100</b>', $border = $isBorder, $ln = 0, $align = '', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M' ); 
+                PDF::Ln();
                 if($rowPerPage==0){
                      $html ='
-                    <table class="table table-striped no-margin" >
+                    <table class="table table-striped no-margin" border="1" style="padding: 3px;" >
                          <thead>   
-                          <tr>
-                                <th style="font-weight: bold; text-align: center; width: 320px;" border="1">วิชา/กิจกรรม</th>
-                                <th style="font-weight: bold; text-align: center; width: 30px;" border="1">ลำดับ</th>
-                                <th style="font-weight: bold; text-align: center; width: 50px;" border="1">หน่วย</th>
-                                <th style="font-weight: bold; text-align: center; width: 50px;" border="1">คะแนน</th>
+                            <tr>
+                            <th style="font-weight: bold; text-align: center; width: 150px;" >เวลาการอบรมรวม</th>
+                            <th style="font-weight: bold; text-align: center; width: 150px;" >ลาป่วย</th>
+                            <th style="font-weight: bold; text-align: center; width: 150px;" >ลากิจ</th>
+                            <th style="font-weight: bold; text-align: center; width: 150px;" >ลาประจำชั่วโมง</th>
                             </tr>
-                          </thead>
-                          <tbody>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <th style="text-align: center; width: 150px;" >จำนวน </th>
+                            <th style="text-align: center; width: 150px;" >จำนวน   วัน</th>
+                            <th style="text-align: center; width: 150px;" >จำนวน    วัน</th>
+                            <th style="text-align: center; width: 150px;" >จำนวน    ชั่วโมง</th>
+                            </tr>
+                        </tbody>
+                    </table>
                     '; 
+                    PDF::writeHTMLCell(0, 0, '', '', $html, 0, 1, 0, true, '', true);
                 } // rowPerPage
                 // dd($courses['items']); exit();
-           
+                $y+=$yHeight;   // new line
+                $y+=$yHeight;   // new line
+                $y+=$yHeight;   // new line
+                PDF::Ln();
+
+                $x=20;              
+                PDF::writeHTMLCell(200, $yHeight, $x, $y, '<b style="text-align: left;"><span style="text-decoration-line: underline;">ตอนที่ 2</span> : การปะรเมินความรู้รายวิชา</b>', $border = $isBorder, $ln = 0, $align = '', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M' );                 
+                $y+=$yHeight;   // new line
+                PDF::Ln();
+                if($rowPerPage==0){
+                     $html ='
+                    <table class="table table-striped no-margin" border="1" style="padding: 3px;" >
+                         <thead>   
+                          <tr>
+                            <th style="font-weight: bold; text-align: center; width: 400px;" >วิชา/กิจกรรม</th>
+                            <th style="font-weight: bold; text-align: center; width: 100px;" >ลำดับ</th>
+                            <th style="font-weight: bold; text-align: center; width: 100px;" >คะแนน</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                    '; 
+                } // rowPerPage
+
                 foreach($courses['items'] as $key => $course){
-                        $html .= '<tr>
-                            <td>'.$course->program_course_name.'</td>
-                            <td>'.$course->course_scoure.'</td>';
-                            $tmpScore = '0';
-                            foreach($course_test_students['items'] as $k => $v){
-                                if( $v->class_student_id == $class_student->class_student_id && $v->course_id == $course->program_course_id ){
-                                    $tmpScore = $v->sum_score;        
-                                     break;
-                                }
+                    $html .= '<tr>
+                        <td style="text-align: left; width: 400px;" >'.$course->program_course_name.'</td>
+                        <td style="text-align: right; width: 100px;" >'.$course->course_scoure.'</td>';
+                        $tmpScore = '0';
+                        foreach($course_test_students['items'] as $k => $v){
+                            if( $v->class_student_id == $class_student->class_student_id && $v->course_id == $course->program_course_id ){
+                                $tmpScore = $v->sum_score;        
+                                 break;
                             }
-                            $html .= '<td>'.$tmpScore.'</td>
-                        </tr>';
-                        //  $y+=$yHeight;   // new line
-                        // $x=2; 
-                        // PDF::writeHTMLCell(100, $yHeight, $x, $y, $course->course_name, $border = $isBorder, $ln = 0, $align = '', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M' ); 
-                        // $x+=100;
-                        // PDF::writeHTMLCell(50, $yHeight, $x, $y, $course->course_scoure, $border = $isBorder, $ln = 0, $align = '', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M' ); 
-                        // $x+=50;
-                        // PDF::writeHTMLCell(50, $yHeight, $x, $y, $course->course_scoure, $border = $isBorder, $ln = 0, $align = '', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M' ); 
-                        // $x+=50;
-                    // PDF::writeHTMLCell(140, $yHeight, '', '', $itm->student_id.'-'.$item->student_id, 0, 1, 0, true, '', true);
-                   
+                        }
+                        $html .= '<td style="text-align: right; width: 100px;" >'.$tmpScore.'</td>
+                    </tr>';
+                    $y+=$yHeight;
                 } // end foreach courses
 
                 $rowPerPage+=1;    
                 if($rowPerPage==1){
                     $html .='</tbody></table>'; 
                     PDF::writeHTMLCell(0, 0, '', '', $html, 0, 1, 0, true, '', true);
-                    // PDF::writeHTMLCell(200, $yHeight, $x, $y, $html, $border = $isBorder, $ln = 0, $align = '', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M' );
                     $html =''; $rowPerPage=0;
                 }
+                $x=20;              
+                PDF::writeHTMLCell(200, $yHeight, $x, $y, '<b style="text-align: left;">คะแนนเฉลี่ยสะสม  </b>', $border = $isBorder, $ln = 0, $align = '', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M' ); 
+                $y+=$yHeight;
 
+                $x=20;              
+                PDF::writeHTMLCell(200, $yHeight, $x, $y, '<b style="text-align: left;"><span style="text-decoration-line: underline;">ตอนที่ 3</span> : ความเห็นผู้บังคับบัญชา  </b>', $border = $isBorder, $ln = 0, $align = '', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M' );
+                $y+=$yHeight;
+
+                $x=20;              // 230
+                PDF::writeHTMLCell(180, $yHeight, $x, $y, '........................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................', $border = $isBorder, $ln = 0, $align = '', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M' ); 
+                $y+=$yHeight;
+                $y+=$yHeight;
+                $y+=$yHeight;
+
+                $x=20;              
+                PDF::writeHTMLCell(200, $yHeight, $x, $y, '<b style="text-align: left;"><span style="text-decoration-line: underline;">ตอนที่ 4</span> : ผลการฝึกอบรม</b>', $border = $isBorder, $ln = 0, $align = '', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M' );
+                
             }   // end foreach 
+            
 
             // if($html!=""){
             //     $html .='</tbody></table>'; 

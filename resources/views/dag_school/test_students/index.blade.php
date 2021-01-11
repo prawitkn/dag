@@ -221,7 +221,7 @@ $(document).ready(function(){
           }
         }); // /.ajax  
 
-      if($(this).val()!=""){
+      if( $('input[name="class_id"]').val() != "" && $('input[name="test_id"]').val() != "" ){
         getList();
       }
     });
@@ -229,7 +229,8 @@ $(document).ready(function(){
     $('select[name="test_name"]').on('change', function() { 
       // alert($(this).val());
       $('input[name="test_id"]').val($(this).val());
-      if($(this).val()!=""){
+      
+      if( $('input[name="class_id"]').val() != "" && $('input[name="test_id"]').val() != "" ){
         getList();
       }
     });
