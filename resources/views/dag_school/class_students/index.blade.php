@@ -75,6 +75,7 @@
 	        <thead>
 	            <tr>
 	                <th class="col_no" style="text-align: center;" >ลำดับ</th>
+                  <th class="col_img" style="text-align: center;" >รูปภาพ</th>
                   <th class="col_name" style="text-align: center;" >ยศ ชื่อ นามสกุล</th>
                   <th class="col_org" style="text-align: center;" >หน่วย</th>
 	                <th class="col_status" style="text-align: center;" >สถานะ</th>
@@ -129,6 +130,7 @@ $(document).ready(function(){
                 autoWidth: false,
                 columns: [
                     { data: null },
+                    { data: null },
                     { data: 'student_name' },
                     { data: 'org_name' },
                     { data: null },
@@ -143,6 +145,15 @@ $(document).ready(function(){
                             return tmp;
                          }
                      }, 
+                     {   targets: 'col_img',
+                        width: 50,
+                        className: 'dt-center',
+                         render: function (data, type, row, meta) {
+                          var file = "{{ url('storage/app/dag_school/photos/students') }}"+'/'+row.id;
+                          var tmp = '<div style="background-image: url('+file+')" class="media-object avatar avatar-md mr-3"></div>';
+                            return tmp;
+                         }
+                     },     
                      {   targets: 'col_status',
                         width: 10,
                         className: 'dt-center',

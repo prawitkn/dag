@@ -58,24 +58,13 @@
 
     <div class="row">
       <div class="col-md-12">
-        หลักสูตร : 
-        <select class="form-control">
-          <option value=""> - Select - </option>
-          @foreach($program_student_headers as $val)
-            <option value="{{$val->id}}">{{$val->program_student_name}}</option>
-          @endforeach
-        </select>
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="col-md-12">
 
 	    <div class="table-responsive">
 	    <table id="tbl_main" class="hover compact" style="width: 100%;"   >
 	        <thead>
 	            <tr>
 	                <th class="col_no" style="text-align: center;" >ลำดับ</th>
+                  <th class="col_img" style="text-align: center;" >รูปภาพ</th>
                   <th class="col_name" style="text-align: center;" >ยศ ชื่อ นามสกุล</th>
                   <th class="col_org_name" style="text-align: center;" >หน่วย</th>
 	                <th class="col_status" style="text-align: center;" >สถานะ</th>
@@ -116,19 +105,20 @@ $(document).ready(function(){
             tbl_main.ajax.reload( null, false );
         }else{
             tbl_main = $('#tbl_main').DataTable( {
-                searching: false,
-                paging: false,
+                searching: true,
+                paging: true,
                 info: false,
                 fixedHeader: true,
                 ajax: {
                     type: 'GET',
-                    url: "{{ url('dag_school/program-student/list') }}",
+                    url: "{{ url('dag_school/students/list') }}",
                     dataSrc: 'items',
                 },
                 autoWidth: false,
                 columns: [
                     { data: null },
-                    { data: 'customer_name' },
+                    { data: null },
+                    { data: 'student_name' },
                     { data: 'org_name' },
                     { data: null },
                     { data: null }
@@ -141,6 +131,15 @@ $(document).ready(function(){
                             return meta.row+1;
                          }
                      }, 
+                     {   targets: 'col_img',
+                        width: 50,
+                        className: 'dt-center',
+                         render: function (data, type, row, meta) {
+                          var file = "{{ url('storage/app/dag_school/photos/students') }}"+'/'+row.id+'.jpg';
+                          var tmp = '<div style="background-image: url('+file+')" class="media-object avatar avatar-md mr-3"></div>';
+                            return tmp;
+                         }
+                     },     
                      {   targets: 'col_status',
                         width: 10,
                         className: 'dt-center',

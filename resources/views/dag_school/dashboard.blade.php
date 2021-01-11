@@ -22,7 +22,7 @@
 <div class="breadcrumb-holder">
   <div class="container-fluid">
     <ul class="breadcrumb">
-      <li class="breadcrumb-item active"><a href="{{ url('online_store') }}">หน้าแรก</a></li>
+      <li class="breadcrumb-item active"><a href="index.html">หน้าแรก</a></li>
     </ul>
   </div>
 </div>
@@ -30,7 +30,66 @@
 
 <section>
   <div class="container-fluid">
+     @if(Session::has('flash_message_error'))
+          <div class="alert alert-danger alert-block">
+              <button type="button" class="close" data-dismiss="alert">×</button> 
+                  <strong>{!! session('flash_message_error') !!}</strong>
+          </div>
+      @endif
+      
+      @if(Session::has('flash_message_success'))
+          <div class="alert alert-success alert-block">
+              <button type="button" class="close" data-dismiss="alert">×</button> 
+                  <strong>{!! session('flash_message_success') !!}</strong>
+          </div>
+      @endif
 
+
+    <!-- Page Header-->
+    <header> 
+      <h3 class="display">หน้าแรก
+      </h3>
+      
+
+    </header>
+    <!-- Page Header-->
+
+    <div class="row">
+      <form id="frm1">
+      <div class="col-md-12">
+        <select name="program_class_name" class="form-control">
+          <option value=""> - Select - </option>
+          @foreach($program_classes as $val)
+            <option value="{{$val->id}}">{{$val->program_class_name}}</option>
+          @endforeach
+        </select>
+        <input type="hidden" name="program_class_id" value="" />
+      </div>
+    </form>
+    </div>
+
+     <!-- Table -->
+      <div class="table-responsive">
+        <table id="table_main" class="compact row-border hover" style="width: 100%" > 
+            <thead>
+                <tr>
+                    <th class="col_no" style="text-align: center;">เลขที่</th>
+                    <th class="col_img" style="text-align: center;">รูปภาพ</th>
+                    <th class="col_name" style="text-align: center;">ยศ ชื่อ นามสกุล</th>
+                    <th class="col_org" style="text-align: center;">หน่วย</th>
+                    <th class="col_score" style="text-align: center;">คะแนน</th>
+                </tr>
+            </thead>
+            <tbody> 
+          
+            </tbody>
+        </table>
+      </div>
+      <!--/.table-responsive-->
+      <footer>
+          &nbsp;<a target="_blank" name="btn_pdf" class="btn btn-sm btn-primary shadow rounded text-white" > นำออก PDF</a>
+          &nbsp;<a target="_blank" name="btn_certificate" class="btn btn-sm btn-primary shadow rounded text-white" > ใบประกาศ</a>
+      </footer>
   </div>
   <!--/.container-fluid-->
 </section>
@@ -39,6 +98,35 @@
 
 
 
+<!-- The Modal -->
+<div class="modal" id="modal1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h4 class="modal-title">Welcome</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+
+      <!-- Modal body -->
+      <div class="modal-body">
+		
+		
+      </div>
+      <!--/.modal body -->
+
+      <!-- Modal footer -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+      </div>
+
+    </div>
+    <!--/. modal-content -->
+  </div>
+  <!--/. modal-dialog -->
+</div>     
+<!--/. The Modal -->    
 
 @endsection   
 
@@ -50,189 +138,113 @@
        max-width:1200px;
       }
     }
+
     table.dataTable.compact tbody td {
         padding: 0px !important; 
         line-height: 1 !important;
     }
-  table.dataTable.compact tbody tr { height: 20px; }
 </style>
-
-
-
-
-<link href="{{ asset('public/assets/libs/bootstrap-datepicker-custom-thai/dist/css/bootstrap-datepicker.css') }}" rel="stylesheet" />
-<script src="{{ asset('public/assets/libs/bootstrap-datepicker-custom-thai/dist/js/bootstrap-datepicker-custom.js') }}"></script>
-<script src="{{ asset('public/assets/libs/bootstrap-datepicker-custom-thai/dist/locales/bootstrap-datepicker.th.min.js') }}" charset="UTF-8"></script>
-
-
-
-
 
 <!-- Set default evaluator -->
 <script type="text/javascript">
 
 $(document).ready(function(){
-    $('.datepicker').datepicker({
-        daysOfWeekHighlighted: "0,6",
-        autoclose: true,
-        format: 'dd/mm/yyyy',
-        todayBtn: true,
-        minDate: '01/01/2020',
-        language: 'en',             //เปลี่ยน label ต่างของ ปฏิทิน ให้เป็น ภาษาไทย   (ต้องใช้ไฟล์ bootstrap-datepicker.th.min.js นี้ด้วย)
-        thaiyear: false              //Set เป็นปี พ.ศ.
-    });  
+  function number_format (number, decimals, dec_point, thousands_sep) {
+    // Strip all characters but numerical ones.
+    number = (number + '').replace(/[^0-9+\-Ee.]/g, '');
+    var n = !isFinite(+number) ? 0 : +number,
+        prec = !isFinite(+decimals) ? 0 : Math.abs(decimals),
+        sep = (typeof thousands_sep === 'undefined') ? ',' : thousands_sep,
+        dec = (typeof dec_point === 'undefined') ? '.' : dec_point,
+        s = '',
+        toFixedFix = function (n, prec) {
+            var k = Math.pow(10, prec);
+            return '' + Math.round(n * k) / k;
+        };
+    // Fix for IE parseFloat(0.55).toFixed(0) = 0;
+    s = (prec ? toFixedFix(n, prec) : '' + Math.round(n)).split('.');
+    if (s[0].length > 3) {
+        s[0] = s[0].replace(/\B(?=(?:\d{3})+(?!\d))/g, sep);
+    }
+    if ((s[1] || '').length < prec) {
+        s[1] = s[1] || '';
+        s[1] += new Array(prec - s[1].length + 1).join('0');
+    }
+    return s.join(dec);
+}
 
-    //กำหนดเป็นวันปัจุบัน
-    @if(request()->issue_date)
-      var queryDate = '{{ request()->issue_date }}',
-      dateParts = queryDate.match(/(\d+)/g)
-      realDate = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]); 
-      $('.datepicker').datepicker('setDate', queryDate);
-    @else
-      $('.datepicker').datepicker('setDate', '0'); 
-    @endif
-
-    $('#issue_date').keypress(function(e){ 
-      e.preventDefault(); 
-    }); //. $('a[name=btnSearchEvaluator]').click(function(){ 
-
-     $('#issue_date').change(function(e){ 
-        getMainList();
-    }); //. $('a[name=btnSearchEvaluator]').click(function(){  
-  function datepickerToSqlDate(dateString){ // dateString = dd/mm/yyyy    
-    var dateParts = dateString.split("/");
-    // month is 0-based, that's why we need dataParts[1] - 1
-    var d = new Date(+dateParts[2], dateParts[1] - 1, +dateParts[0]); 
-
-    // var d = new Date(date),
-        month = '' + (d.getMonth() + 1),
-        day = '' + d.getDate(),
-        year = d.getFullYear();
-
-      if (month.length < 2) 
-          month = '0' + month;
-      if (day.length < 2) 
-          day = '0' + day;
-
-      return [year, month, day].join('-');
-  }
-
-
-  var tbl_main; 
-    function getMainList(){  
-        if ($.fn.DataTable.isDataTable('#tbl_main')) {    
-      tbl_main.ajax.reload( null, false );
+    var table_main; // = $('#table').DataTable();
+    function getList(){ //alert('big');
+        if ($.fn.DataTable.isDataTable('#table_main')) {
+            table_main.ajax.reload( null, false );
         }else{
-        tmpId = $('#id').val(); 
-        tmpUrl = "{{ url('/online_store/orders/list-total-by-customer') }}";
-        tbl_main = $('#tbl_main').DataTable( {
-        searching: false,
-        paging: false,
-        info: false,
-        fixedHeader: true,
-        ajax: {
-            url: tmpUrl,
-            type: 'GET',
-            dataType:"json",
-            data: {
-              issue_date: function() { return $('#issue_date').val() },
-            },
-            dataSrc: 'items',
-        },
-        autoWidth: false,
-        columns: [               
-            { data: null },        
-            { data: 'customer_name' },     
-            { data: 'updated_ship_to' },     
-            { data: 'total_ship_to' },     
-            { data: null },      
-        ],
-        order: [[ 1, 'asc' ], [ 3, 'asc' ]],
-        columnDefs: [
-        {   targets: 'col_no',
-            width: '50',
-            className: 'dt-center',
-             render: function (data, type, row, meta) {
-              var tmpHtml = meta.row+1;
-                return tmpHtml;
-             }
-         },      
-        {   targets: 'col_updated',
-            width: '100',
-            className: 'dt-center',
-         },    
-        {   targets: 'col_total',
-            width: '100',
-            className: 'dt-center',
-         },    
-           {   targets: 'col_action',
-                className: 'dt-center',
-               render: function (data, type, row, meta) {
-              var tmp = '';
-              var tmpDate = $('#issue_date').val();
-               tmp = '<a name="btn_item_remove" target="_blank" href="{{ url("online_store/orders/view-list") }}?issue_date='+tmpDate+'&user_id='+row.id+'" class="btn btn-primary rounded shadow btn-sm"  /> แสดง</a>';
-                    return tmp;
-             }
-           },                    
-        ]
-      });
-      }    
-  } //.getMainList()
+            table_main = $('#table_main').DataTable( {
+                searching: false,
+                paging: false,
+                info: false,
+                autoWidth: false,
+                fixedHeader: true,
+                ajax: {
+                    type: 'GET',
+                  url: "{{ url('/dag_school/get-student_summary_list_by_class_id/') }}",
+                    data: {
+                        program_class_id: function() { return $('input[name="program_class_id"]').val() },
+                    },
+                    dataSrc: 'items',
+                },
+                autoWidth: false,
+                columns: [       
+                    { data: null },
+                    { data: null },
+                    { data: 'student_name' },
+                    { data: 'org_name' },
+                    { data: null },
+                ],                
+        columnDefs: [                     
+                     {   targets: 'col_no',
+                      width: 20,
+                        className: 'dt-center',
+                         render: function (data, type, row, meta) {
+                            return meta.row+1;
+                         }
+                     },    
+                     {   targets: 'col_img',
+                        width: 50,
+                        className: 'dt-center',
+                         render: function (data, type, row, meta) {
+                          var file = "{{ url('storage/app/dag_school/photos/students') }}"+'/'+row.student_id+'.jpg';
+                          var tmp = '<div style="background-image: url('+file+')" class="media-object avatar avatar-md mr-3"></div>';
+                            return tmp;
+                         }
+                     },     
+                     {   targets: 'col_score',
+                        width: 100,
+                        className: 'dt-center',
+                         render: function (data, type, row, meta) {
+                            return number_format(row.net_score*100,2,'.',',');
+                         }
+                     },    
+                ]
+            } );
+        }    
+    } //.getList()
 
-  getMainList();
+    getList();
 
-  function listByCustomer($issue_date, $user_id){
-     tmpUrl = '{{ url("/production/online_store/orders/view-list") }}'+'?user_idl='+$user_id;
-     location = tmpUrl;
-  } 
+  $('select[name="program_class_name"]').change(function(e){ 
+      $('input[name="program_class_id"]').val($('select[name="program_class_name"] option').filter(":selected").val());  
+    getList();
+  }); // change
 
-  $('a[name="btn_export"]').click(function(e){        
-      var date = $('input[name="issue_date"]').val();    
-      // date = datepickerToSqlDate(date);
+  $('a[name="btn_pdf"]').click(function(){
+      window.open( "{{ url('dag/dag_school/student-summary-pdf') }}" + '?type=date&' + $('#frm1').serialize(), 'Blank' );
+  });
 
-      tmpUrl = '{{ url('online_store/orders/export-excel') }}?'+date;
-      location = tmpUrl; 
-    }); // click
-
-  $('a[name="btn_end"]').click(function(e){        
-    if(confirm("คุณต้องการที่จะปิดเวลาสามารถการสั่งสินค้าใช่หรือไม่ ? ")){
-      var params = {};
-      var tmp = $('#frm1').serialize();
-      params = tmp; 
-      $.ajaxSetup({
-          headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
-      }); 
-      $.ajax({
-        url: "{{ url('/online_store/orders/end') }}",
-        type: 'post', dataType:"json", data: params,
-        success: function (res) { 
-          // console.log(res);
-          if(res.success=="success"){
-            $('#divFlashAlert').append('<div class="alert alert-success alert-block col-md-12">'+
-                '<button type="button" class="close" data-dismiss="alert">×</button>'+ 
-                    '<strong>'+res.msg+'</strong>'+
-            '</div>'); 
-            $('#divFlashAlert').children('div:last').delay(1000).fadeOut('slow');   
-          }else{
-            $('#divFlashAlert').append('<div class="alert alert-danger alert-block col-md-12">'+
-                '<button type="button" class="close" data-dismiss="alert">×</button>'+ 
-                    '<strong>'+res.msg+'</strong>'+
-            '</div>'); 
-            // $('#divFlashAlert').children('div:last').delay(5000).fadeOut('slow'); 
-          } 
-        },
-        error: function(xhr, status, error) {
-          console.log(xhr);
-          var err = eval("(" + xhr.responseText + ")");
-          alert(JSON.parse(xhr.responseText).message);
-          }
-        }); // /.ajax  
-      } // if
-    }); // click
+  $('a[name="btn_certificate"]').click(function(){
+      window.open( "{{ url('dag/dag_school/student-certificate-pdf') }}" + '?type=date&' + $('#frm1').serialize(), 'Blank' );
+  });
+  
 });
-
-
-
 </script>
 
 

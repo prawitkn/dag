@@ -253,6 +253,7 @@ $(document).ready(function(){
           type: 'post', dataType:"json", data: params,
           success: function (res) { console.log(res);
             alert(res.msg);
+            console.log(res.item);
               if(res.success=="success"){
                 getList();
               }else{

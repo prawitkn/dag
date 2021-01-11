@@ -119,13 +119,13 @@ class DagsProgramClassTestStudentController extends Controller
 	public function score_update(Request $req){
 		$res = [];
 
-		// return($reference_item_ids);
-		$tmp = $req->all();
-
 		try{
+			$program_class_id = $req['class_id']; 
+
 			$program = DB::table('dags_program_course_tests as a')
 			->join('dags_program_courses as b','b.id','=','a.program_course_id')
-			->select('b.program_id')
+			->select('a.program_course_id','a.program_course_test_name','a.score'
+				, 'b.program_id','b.course_hierarchy','b.course_no','b.course_name','b.course_description','b.course_hours','b.credit')
 			->where('a.id','=',$req['test_id'])
 			->first();
 			if(!$program){
@@ -162,119 +162,99 @@ class DagsProgramClassTestStudentController extends Controller
 					}
 
 					$count+=1;
-				}
-			}
+				} //if
+			} //foreach
 
 			// INSERT course test hireacy 
 			$result = DB::table('dags_programs as x')
-		->join('dags_program_courses as a','a.program_id','=','x.id')
-		->join('dags_program_course_tests as b','b.program_course_id','=','a.id')
-		->select('b.id', 'a.course_hierarchy', 'a.course_no', 'a.course_name'
+			->join('dags_program_courses as a','a.program_id','=','x.id')
+			->join('dags_program_course_tests as b','b.program_course_id','=','a.id')
+			->select('b.id', 'a.course_hierarchy', 'a.course_no', 'a.course_name'
 			, 'b.program_course_test_name', 'b.status')
-        ->where('x.id','=',$req['program_id'])
-        ->orderBy('a.course_hierarchy','ASC')
+			->where('x.id','=',$req['program_id'])
+			->orderBy('a.course_hierarchy','ASC')
 			->get();
 
 		// Insert if not exists
-		DB::statement('
-			INSERT INTO dags_program_class_test_students (program_course_test_id, class_student_id)
-			SELECT a.id, b.id as class_student_id  
-			FROM dags_program_course_tests as a 
-			CROSS JOIN dags_program_class_students as b ON b.program_class_id='.$req['class_id'].'
-			WHERE a.program_course_id IN (SELECT x.id FROM dags_program_courses as x 
-			                              					WHERE RIGHT(x.course_hierarchy,4)="0000"
-			                              					AND RIGHT(x.course_hierarchy,6)<>"000000"
-			                              					)
-			AND NOT EXISTS (SELECT m.id FROM dags_program_class_test_students m
-			                  				WHERE m.program_course_test_id=a.id
-			                  				AND m.class_student_id=b.id )
-        ');
+			DB::statement('
+				INSERT INTO dags_program_class_test_students (program_course_test_id, class_student_id, created_by)
+				SELECT a.id, b.id as class_student_id,'.Auth::user()->id.'   
+				FROM dags_program_course_tests as a 
+				CROSS JOIN dags_program_class_students as b ON b.program_class_id='.$program_class_id.'
+				WHERE a.program_course_id IN (SELECT x.id FROM dags_program_courses as x 
+				                              					WHERE RIGHT(x.course_hierarchy,4)="0000"
+				                              					AND RIGHT(x.course_hierarchy,6)<>"000000"
+				                              					)
+				AND NOT EXISTS (SELECT m.id FROM dags_program_class_test_students m
+				                  				WHERE m.program_course_test_id=a.id
+				                  				AND m.class_student_id=b.id )
+			');
+
+			// Update Course Test is finished
+			DB::statement('UPDATE dags_program_course_tests as a 
+				SET a.is_finished=1 
+				WHERE a.id='.$req['test_id'].' 
+	        ');
+
+	        // Update Course is finished
+			DB::statement('UPDATE dags_program_courses as a 
+				SET a.is_finished=1 
+				, a.score=(SELECT SUM(x.score) FROM dags_program_course_tests as x
+							WHERE x.program_course_id=a.id) 
+				WHERE a.id='.$program->program_course_id.' 
+	        ');
+
+			
+
+			// Update Student Score
+			DB::statement('UPDATE dags_program_class_students as a 
+				INNER JOIN (SELECT x.class_student_id, SUM(x.score) as total_score FROM dags_program_class_test_students as x
+							INNER JOIN dags_program_course_tests as y ON y.id = x.program_course_test_id AND y.is_finished=1 
+							INNER JOIN dags_program_courses as z ON z.id = y.program_course_id 
+							INNER JOIN dags_program_classes as xx ON xx.program_id = z.program_id AND xx.id = '.$program_class_id.' 
+							GROUP BY x.class_student_id) as tmp 
+				SET a.score=tmp.total_score 
+				WHERE a.program_class_id = '.$program_class_id.' 
+				AND a.id = tmp.class_student_id 
+	        ');
+
+			// Get Total Score
+			// $program_finished = DB::table('dags_program_courses as a')
+			// ->select(DB::raw('SUM(a.score) as total_score'))
+			// ->where('a.program_id','=',$program->id)
+			// ->first();
+			// Get Total Score for Calculation
+			$course_finished = DB::table('dags_program_courses as a')
+			->select(DB::RAW('SUM(a.score) as total_finished_score'))
+			->where('a.program_id','=',$program->program_id)
+			->where('a.is_finished','=',1)
+			->first();
+
+			// Update Summary Score 
+			DB::statement('UPDATE dags_program_class_students as a 
+				SET a.net_score = a.score / '.$course_finished->total_finished_score.' 
+				WHERE a.program_class_id = '.$program_class_id.' 
+	        ');
+	        // DB::table('dags_program_class_students')
+	        // ->update(['a.net_score'=>DB::RAW(' a.score / '.$program_finished->total_score.' ')])
+	        // ->where('program_class_id','=',$program_class_id);
 
 
-			return $res = [
-				'success'=> 'success',
-				'msg'=> 'บันทึกเรียบร้อย',
-				// 'chk'=> $chk,
-			];			
+				return $res = [
+					'success'=> 'success',
+					'item'=> $course_finished,
+					'msg'=> 'บันทึกเรียบร้อย',
+					// 'chk'=> $chk,
+				];			
 		}catch(Exception $e){
             Log::warning(sprintf('Exception: %s', $e->getMessage()));
 
             return $res = [
                 'success' => 'false',
-                'row_count' => 0,
-                'items' => [],
                 'msg' => $e->getMessage(),
             ];
         }         
 		
 	}
-	// public function edit_view(Request $req, $item_id)
- //    {
- //    	$program_course = DB::table('dags_program_classes as a')
- //    	->leftjoin('dags_programs as b','b.id','=','a.program_id')
- //    	->where('a.id','=',$item_id)
- //    	->select('a.id','a.program_id','a.course_hierarchy','a.course_no','a.course_name','a.course_description','a.course_hours','a.credit','a.status'
- //    	, 'b.program_name')
- //    	->first();
-
- //        return view('dag_school.classes.edit')->with(compact('program_course'));
- //    }
-
- //    public function update(Request $req){
- //        $res = [];      
- //        try{
- //            if($req->isMethod('post')){                
- //                // check duplicate product_category code
- //           //     	$customer = DagsProgramClass::where('customer_name','=',$req['customer_name'])
- //           //      	->where('id','<>',$req['id'])->first();
- //           //      if($customer){
- //           //      	$res = [
-	// 	         //        'success' => 'false',
-	// 	         //        'msg' => 'ผิดพลาด : ข้อมูลซ้ำ รหัส '.$req['customer_name'].' มีในฐานข้อมูลแล้ว',
-	// 	         //    ];
- //        			// return $res;
- //           //      }
-                
-
- //                $program_course = DagsProgramClass::find($req['id']);
-
- //                if(!$program_course){
- //                    // Error 
- //                    $res = [
-	// 	                'success' => 'false',
-	// 	                'msg' => 'ไม่พบข้อมูล',
-	// 	            ];
- //        			return $res;
- //                }else{ 
- //                    // Update
- //                    $program_course['course_hierarchy'] = $req['course_hierarchy'];
- //                    $program_course['course_no'] = $req['course_no'];
- //                    $program_course['course_name'] = $req['course_name'];
- //                    $program_course['course_description'] = $req['course_description'];
- //                    $program_course['course_hours'] = $req['course_hours'];
- //                    $program_course['credit'] = $req['credit'];
- //                    $program_course['status'] = ($req['status']?1:0);
- //                    $program_course['updated_by'] = Auth::user()->id;
- //                    $program_course->save(); 
- //                }
-                
- //                $res = [
- //                    'success' => 'success',
- //                    'row_count' => 1,
- //                    'items' => $program_course,
- //                    'msg' => 'บันทึกข้อมูลสำเร็จ.',
- //                ];
- //            } // if post
- //        }catch(Exception $e){
- //            Log::warning(sprintf('Exception: %s', $e->getMessage()));
-
- //            $res = [
- //                'success' => 'false',
- //                'row_count' => 0,
- //                'items' => [],
- //                'msg' => $e->getMessage(),
- //            ];
- //        }         
- //        return $res;
- //    }	
+	
 }

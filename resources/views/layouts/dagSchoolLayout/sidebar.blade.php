@@ -14,7 +14,7 @@
     <div class="main-menu">
     	<ul id="side-main-menu" class="side-menu list-unstyled">  
         @if(Auth::user()->isAdmin())
-          <li><a href="{{ url('/dags') }}"> <i class="icon-home"></i>หน้าแรก</a></li>
+          <li><a href="{{ url('/dag_school') }}"> <i class="icon-home"></i>หน้าแรก</a></li>
         @endif       
         @if(Auth::user()->isOnlineStoreSalesAdmin())
           <li><a href="{{ url('/dags/dashboard') }}"> <i class="icon-home"></i>หน้าแรก</a></li>

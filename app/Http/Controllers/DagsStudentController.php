@@ -11,23 +11,17 @@ use App\DagsStudent;
 class DagsStudentController extends Controller
 {
     public function list_view()
-    {	$program_student_headers = DagsProgramStudentHeader::where('status','=',1)->get();
+    {	$students = DagsStudent::where('status','=',1)->get();
 
-    	return view('dag_school.students.index')->with(compact('program_student_headers'));
+    	return view('dag_school.students.index')->with(compact('students'));
     }
-public function list(Request $req, $program_student_header_id){
+public function list(Request $req){
 		$res = [];		
-
-        if($program_student_header_id){
-            $students = DB::table('dags_program_student_header as b')
-            ->join('dags_programs as a','b.program_id','=','a.id')
-            ->leftjoin('dags_program_students as c','c.program_student_id','=','b.id')
-            ->leftjoin('dags_students as d','d.id','=','c.student_id')
-            ->select('a.id as program_id','a.program_name'
-                , 'b.program_student_name'
-                , 'c.student_name', 'c.org_name'
+        
+        try{
+            $students = DB::table('dags_students as a')
+            ->select('a.*'
             )
-            ->where('b.program_student_id','=',$program_student_header_id)
             ->get();
 
             $res = [
@@ -37,15 +31,16 @@ public function list(Request $req, $program_student_header_id){
                 'msg'=> 'เรียบร้อย.',
             ];
             return $res; 
-        }else{
+        }catch(Exception $e){
+            Log::warning(sprintf('Exception: %s', $e->getMessage()));
+
             $res = [
                 'success' => 'false',
                 'row_count' => 0,
                 'items' => [],
                 'msg' => $e->getMessage(),
             ];
-            return $res; 
-        }
+        }      
 	}
 
 	public function edit_view(Request $req, $id)

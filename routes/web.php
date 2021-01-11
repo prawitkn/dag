@@ -12,8 +12,17 @@
 */
 Auth::routes();
 
-Route::get('/dag_school','DagSchoolController@index');
+
 Route::group(['middleware' => 'auth'], function(){
+
+	Route::get('dag_school/get-student_summary_list_by_class_id','DagSchoolController@getStudentSummaryList');
+	Route::get('/dag_school','DagSchoolController@index');
+	Route::get('/dag/dag_school/student-summary-pdf','DagSchoolController@studentSummaryPdf');
+	Route::get('/dag/dag_school/student-certificate-pdf','DagSchoolController@studentCertificatePdf');
+
+
+
+	
 	// Students
 	Route::get('/dag_school/students/view-list','DagsStudentController@list_view');
 	Route::get('/dag_school/students/list','DagsStudentController@list');
@@ -29,6 +38,14 @@ Route::group(['middleware' => 'auth'], function(){
 	Route::post('dag_school/programs/create','DagsProgramController@create')->name('create');
 	Route::get('dag_school/programs/edit/{id}','DagsProgramController@edit_view');
 	Route::post('dag_school/programs/update','DagsProgramController@update')->name('update');
+
+	// Program Course
+	Route::get('/dag_school/program-courses/view-list','DagsProgramCourseController@list_view');
+	Route::get('/dag_school/program-courses/list','DagsProgramCourseController@list');
+	Route::get('dag_school/program-courses/new','DagsProgramCourseController@new_view');
+	Route::post('dag_school/program-courses/create','DagsProgramCourseController@create')->name('create');
+	Route::get('dag_school/program-courses/edit/{id}','DagsProgramCourseController@edit_view');
+	Route::post('dag_school/program-courses/update','DagsProgramCourseController@update')->name('update');
 
 	// Program Class
 	Route::get('dag_school/program-classes/view-list','DagsProgramClassController@list_view');
@@ -76,6 +93,27 @@ Route::group(['middleware' => 'auth'], function(){
 	// Route::post('dag_school/courses/create','DagsCourseController@create')->name('create');
 	// Route::get('dag_school/courses/edit/{id}','DagsCourseController@edit_view');
 	// Route::post('dag_school/courses/update/{id}','DagsCourseController@update')->name('update');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
