@@ -208,7 +208,7 @@ $(document).ready(function(){
               if(res.success=="success"){
                 $.each(res.items, function( index, value ) {
                   // alert( index + ": " + value );
-                  $('select[name="test_name"]').append('<option value="'+value['id']+'">'+value['program_course_test_name']+'</option>');
+                  $('select[name="test_name"]').append('<option value="'+value['id']+'">'+value['course_id']+' : '+value['program_course_test_name']+'</option>');
                 });
               }else{
                alert(res.msg);                  

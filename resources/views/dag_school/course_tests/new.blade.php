@@ -1,4 +1,4 @@
-@extends('layouts.onlineStoreLayout.design')
+@extends('layouts.dagSchoolLayout.design')
 
 @section('head')
 @endsection
@@ -20,7 +20,7 @@
   <div class="container-fluid">
     <!-- Page Header-->
     <header> 
-      <h1 class="display">เพิ่มลูกค้า
+      <h1 class="display">เพิ่มแบบทดสอบ
       </h1>
 
     </header>
@@ -35,10 +35,31 @@
           <input type="hidden" id="id" value="" />
         
             <div class="row">
+              <div class="col-md-4">    
+                <div class="form-group-material">          
+                  <select name="program_course_name" class="form-control" required>
+                    <option value=""> - Select - </option>
+                  @foreach($program_courses as $program_course)
+                    <option value="{{$program_course->id}}">{{ $program_course->course_no.' '.$program_course->course_name }}</option>
+                  @endforeach
+                  </select>
+                  <label for="program_course_name" class="label-material-select" >วิชา : </label>      
+                  <input type="hidden" name="program_course_id" value="" />
+                </div>
+              </div>
 
-              <div class="form-group col-md-6">
-                <label for="customer_name">ชื่อลูกค้า</label>
-                <input type="text" class="form-control" name="customer_name" value="" required >
+              <div class="col-md-6">
+                <div class="form-group-material">
+                  <input type="text" class="input-material" name="program_course_test_name" value="" required >
+                  <label for="program_course_test_name" class="label-material" >แบบทดสอบ/เรื่องทดสอบ : </label>   
+                </div>
+              </div><!--/.col-6-->
+
+              <div class="col-md-2">
+                <div class="form-group-material">
+                  <input type="text" class="input-material" name="score" value="" required >
+                  <label for="score" class="label-material" >คะแนนเต็ม : </label>   
+                </div>
               </div><!--/.col-6-->
 
             </div><!--/row-->
@@ -104,9 +125,11 @@
 $(document).ready(function(){	
 
 	function formClear(){
-		$('input[name="customer_name"]').val('');
+		$('input[name="program_course_test_name"]').val('');
+    $('input[name="score"]').val('');
+    $('select[name="program_course_name"]').prop("selectedIndex", 0);
 
-    $('input[name="customer_name"]').select();
+    $('input[name="program_course_test_name"]').select();
 	}
 	
 	formClear();
@@ -126,7 +149,7 @@ $(document).ready(function(){
       headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
     }); 
     $.ajax({
-      url: "{{ url('/online_store/customers/create') }}",
+      url: "{{ url('/dag_school/program-course-tests/create') }}",
       type: 'post', dataType:"json", data: params,
       success: function (res) { console.log(res);
         if(res.success=="success"){
@@ -144,6 +167,10 @@ $(document).ready(function(){
     }); // /.ajax   
   }); // click
 
+  $('select[name="program_course_name"]').on('change', function() {
+      $('input[name="program_course_id"]').val($(this).val());
+      getList();
+    });
 });
 
 </script>

@@ -24,29 +24,24 @@ class DagsProgramClassTestStudentController extends Controller
     public function test_list(Request $req)
     {	
     	$res = [];     
-    	if($req->has('class_id')){
-    		$tests = DB::select('select b.course_name
-    			, c.id, c.program_course_test_name, c.score 
-    			FROM dags_program_classes as a
-    			join dags_program_courses as b ON b.program_id=a.program_id AND b.is_calc=1 
-    			join dags_program_course_tests as c ON c.program_course_id=b.id 
-    			WHERE a.status=1 
-    			AND a.id='.$req['class_id']);
-
-    		// $test_id = $req['test_id'];		
-	    //     $tests = DB::table('dags_program_classes as a')
-	    //     ->join('dags_program_courses as b','b.program_id','=','a.id')
-	    //     ->join('dags_program_course_tests as c', function($join) use ($req)
-					// {
-					// 	$join->on('c.program_course_id','=','b.id');
-					// 	$join->on('c.id','=',$req['test_id']);
-					// })
-	    //     ->select('b.course_name'
-	    //     	, 'c.id', 'c.program_course_test_name')
-	    // 	->where('a.status','=',1)
-	    //     ->where('a.id','=',$req['class_id'])
-	    //     ->get();
-
+    	if($req->has('class_id')){ 
+    		$tests = DB::table('dags_program_classes as a')
+    		->join('dags_program_courses as b', function( $join ) use ($req){
+                $join->on('b.program_id','=','a.program_id');
+                $join->where('b.is_calc','=',1);
+            })
+    		->join('dags_program_course_tests as c','c.program_course_id','=','b.id')
+    		->select('b.id as course_id', 'b.course_name'
+    			, 'c.id', 'c.program_course_test_name', 'c.score'
+    			)
+    		->where('a.status','=',1) 
+    		->where('a.id','=',$req['class_id'])
+    		->orderBy('b.id','ASC')
+    		->orderBy('c.id','ASC');
+    		$tests = $tests->get();
+    		// dd($tests); exit();
+    		// dd($tests->toSql()); exit();
+    		// echo $tests->toSql(); exit();
 	    	return $res = [
 	            'success' => 'success',
 	            // 'row_count' => $tests->count(),
@@ -182,8 +177,7 @@ class DagsProgramClassTestStudentController extends Controller
 				FROM dags_program_course_tests as a 
 				CROSS JOIN dags_program_class_students as b ON b.program_class_id='.$program_class_id.'
 				WHERE a.program_course_id IN (SELECT x.id FROM dags_program_courses as x 
-				                              					WHERE RIGHT(x.course_hierarchy,4)="0000"
-				                              					AND RIGHT(x.course_hierarchy,6)<>"000000"
+				                              					WHERE x.is_calc=1 
 				                              					)
 				AND NOT EXISTS (SELECT m.id FROM dags_program_class_test_students m
 				                  				WHERE m.program_course_test_id=a.id
@@ -203,8 +197,7 @@ class DagsProgramClassTestStudentController extends Controller
 							WHERE x.program_course_id=a.id) 
 				WHERE a.id='.$program->program_course_id.' 
 	        ');
-
-			
+		
 
 			// Update Student Score
 			DB::statement('UPDATE dags_program_class_students as a 

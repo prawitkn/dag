@@ -17,8 +17,8 @@ Route::group(['middleware' => 'auth'], function(){
 
 	Route::get('dag_school/get-student_summary_list_by_class_id','DagSchoolController@getStudentSummaryList');
 	Route::get('/dag_school','DagSchoolController@index');
-	Route::get('/dag/dag_school/student-summary-pdf','DagSchoolController@studentSummaryPdf');
-	Route::get('/dag/dag_school/student-certificate-pdf','DagSchoolController@studentCertificatePdf');
+	Route::get('/dag_school/student-summary-pdf','DagSchoolController@studentSummaryPdf');
+	Route::get('/dag_school/student-certificate-pdf','DagSchoolController@studentCertificatePdf');
 
 
 
@@ -82,9 +82,9 @@ Route::group(['middleware' => 'auth'], function(){
 	Route::post('dag_school/program-course-tests/update-scores','DagsProgramClassTestStudentController@score_update');
 
 
-	Route::get('dag_school/program-course-tests/new','DagsProgramClassTestStudentController@new_view');
-	Route::post('dag_school/program-course-tests/create','DagsProgramClassTestStudentController@create')->name('create');
-	Route::get('dag_school/program-course-tests/edit/{item_id}','DagsProgramClassTestStudentController@edit_view');
+	// Route::get('dag_school/program-course-tests/new','DagsProgramClassTestStudentController@new_view');
+	// Route::post('dag_school/program-course-tests/create','DagsProgramClassTestStudentController@create')->name('create');
+	// Route::get('dag_school/program-course-tests/edit/{item_id}','DagsProgramClassTestStudentController@edit_view');
 
 	// Courses
 	// Route::get('/dag_school/courses/view-list/{id}','DagsCourseController@list_view');

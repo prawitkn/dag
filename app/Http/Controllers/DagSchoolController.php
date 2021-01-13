@@ -47,8 +47,11 @@ class DagSchoolController extends Controller
         $result = DB::table('dags_program_classes as a')
         ->join('dags_program_class_students as b','b.program_class_id','=','a.id')
         ->join('dags_students as c','c.id','=','b.student_id')
-        ->select('a.id','a.program_id','a.program_class_name','a.program_class_qty' 
-            ,'b.id as class_student_id','b.score', 'b.net_score'
+        ->select('a.id','a.program_id','a.program_class_name','a.program_class_qty'
+            ,'a.course_hours','a.course_days' 
+            ,'b.id as class_student_id'
+            ,'b.sick_leave','b.personal_leave','b.hourly_leave' 
+            ,'b.score', 'b.net_score'
             ,'c.id as student_id', 'c.student_name','c.org_name','c.photo'
         )
         ->where('a.id','=',Session::get('program_class_id'))
@@ -397,22 +400,26 @@ class DagSchoolController extends Controller
                     <table class="table table-striped no-margin" border="1" style="padding: 3px;" >
                          <thead>   
                             <tr>
-                            <th style="font-weight: bold; text-align: center; width: 150px;" >เวลาการอบรมรวม</th>
-                            <th style="font-weight: bold; text-align: center; width: 150px;" >ลาป่วย</th>
-                            <th style="font-weight: bold; text-align: center; width: 150px;" >ลากิจ</th>
-                            <th style="font-weight: bold; text-align: center; width: 150px;" >ลาประจำชั่วโมง</th>
+                            <th style="font-weight: bold; text-align: center; width: 180px;" >เวลาการอบรมรวม</th>
+                            <th style="font-weight: bold; text-align: center; width: 140px;" >ลาป่วย</th>
+                            <th style="font-weight: bold; text-align: center; width: 140px;" >ลากิจ</th>
+                            <th style="font-weight: bold; text-align: center; width: 140px;" >ลาประจำชั่วโมง</th>
                             </tr>
                         </thead>
                         <tbody>
                         <tr>
-                            <th style="text-align: center; width: 150px;" >จำนวน </th>
-                            <th style="text-align: center; width: 150px;" >จำนวน   วัน</th>
-                            <th style="text-align: center; width: 150px;" >จำนวน    วัน</th>
-                            <th style="text-align: center; width: 150px;" >จำนวน    ชั่วโมง</th>
+                            <th style="text-align: center; width: 180px;" >จำนวน&nbsp;&nbsp;'.$header->course_days.'&nbsp;วัน('.$header->course_hours.'&nbsp;ชั่วโมง)</th>
+                            <th style="text-align: center; width: 140px;" >จำนวน&nbsp;&nbsp;'.$class_student->sick_leave.'&nbsp;วัน</th>
+                            <th style="text-align: center; width: 140px;" >จำนวน&nbsp;&nbsp;'.$class_student->personal_leave.'&nbsp;วัน</th>
+                            <th style="text-align: center; width: 140px;" >จำนวน&nbsp;&nbsp;'.$class_student->hourly_leave.'&nbsp;ชั่วโมง</th>
                             </tr>
                         </tbody>
                     </table>
                     '; 
+            //           ,'a.course_hours','a.course_days' 
+            // ,'b.id as class_student_id'
+            // ,'b.sick_leave','b.personal_leave','b.hourly_leave' 
+
                     PDF::writeHTMLCell(0, 0, '', '', $html, 0, 1, 0, true, '', true);
                 } // rowPerPage
                 // dd($courses['items']); exit();

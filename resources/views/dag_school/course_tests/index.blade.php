@@ -49,7 +49,7 @@
     <!-- Page Header-->
     <header> 
       <h1 class="display">แบบทดสอบ
-	 <!--  &nbsp;<a href="{{ url('online_store/customers/new') }}" class="btn btn-primary shadow rounded" name="btn_add" /> เพิ่ม</a> -->
+	  &nbsp;<a href="{{ url('dag_school/program-course-tests/new') }}" class="btn btn-primary shadow rounded" name="btn_add" /> เพิ่ม</a>
       </h1>
       
 
@@ -77,6 +77,7 @@
 	                <th class="col_no" style="text-align: center;" >ลำดับ</th>
                   <th class="col_name" style="text-align: center;" >วิชา</th>
                   <th class="col_test" style="text-align: center;" >หัวข้อการสอบ</th>
+                  <th class="col_score" style="text-align: center;" >คะแนนเต็ม</th>
 	                <th class="col_status" style="text-align: center;" >สถานะ</th>
 	                <th class="col_action" style="text-align: center;" >การปฏิบัติ</th>
 	            </tr>
@@ -132,6 +133,7 @@ $(document).ready(function(){
                     { data: null },
                     { data: null },
                     { data: null },
+                    { data: null },
                     { data: null }
                 ], 
                 columnDefs: [
@@ -162,6 +164,14 @@ $(document).ready(function(){
                             return tmp;
                          }
                      }, 
+                    {   targets: 'col_score',
+                        width: 50,
+                        className: 'dt-right',
+                         render: function (data, type, row, meta) {
+                            var tmp = row.score;
+                            return tmp;
+                         }
+                     }, 
                      {   targets: 'col_status',
                         width: 10,
                         className: 'dt-center',
@@ -173,7 +183,7 @@ $(document).ready(function(){
                         width: 80,
                         className: 'dt-center',
                          render: function (data, type, row, meta) {
-                          var tmp = '<a name="" href="{{ url('dag_school/program-classes/edit') }}/'+row.id+'" class="btn btn-primary btn-mini rounded" data-ref_id="'+row.id+'" href="#" ><i class="fa fa-edit"></i> แก้ไข</a>';
+                          var tmp = '<a name="" href="{{ url('dag_school/program-course-tests/edit') }}/'+row.id+'" class="btn btn-primary btn-mini rounded" data-ref_id="'+row.id+'" href="#" ><i class="fa fa-edit"></i> แก้ไข</a>';
                             return tmp;
                          }
                      }
