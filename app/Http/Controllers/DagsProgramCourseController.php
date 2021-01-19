@@ -40,11 +40,13 @@ class DagsProgramCourseController extends Controller
     	$program_course = DB::table('dags_program_courses as a')
     	->leftjoin('dags_programs as b','b.id','=','a.program_id')
     	->where('a.id','=',$item_id)
-    	->select('a.id','a.program_id','a.course_hierarchy','a.course_no','a.course_name','a.course_description','a.course_hours','a.credit','a.status'
+    	->select('a.id','a.program_id','a.course_hierarchy','a.course_no','a.course_name','a.course_description','a.course_hours','a.credit','a.is_calc','a.status'
     	, 'b.program_name')
     	->first();
 
-        return view('dag_school.courses.edit')->with(compact('program_course'));
+        $programs = DB::table('dags_programs as a')->where('status','=',1)->select('a.id','a.program_name')->get();
+
+        return view('dag_school.courses.edit')->with(compact('program_course','programs'));
     }
 
     public function update(Request $req){
@@ -80,6 +82,7 @@ class DagsProgramCourseController extends Controller
                     $program_course['course_description'] = $req['course_description'];
                     $program_course['course_hours'] = $req['course_hours'];
                     $program_course['credit'] = $req['credit'];
+                    $program_course['is_calc'] = ($req['is_calc']?1:0);
                     $program_course['status'] = ($req['status']?1:0);
                     $program_course['updated_by'] = Auth::user()->id;
                     $program_course->save(); 
@@ -104,4 +107,65 @@ class DagsProgramCourseController extends Controller
         }         
         return $res;
     }
+
+    public function new_view()
+    {   
+        $programs = DB::table('dags_programs as a')
+        ->where('a.status','=',1)
+        ->select('a.id','a.program_name')
+        ->get();
+
+        return view('dag_school.courses.new')->with(compact('programs'));
+    }
+
+    public function create(Request $req){
+        $res = [];      
+        $user_id = Auth::user()->id;
+        try{
+            if($req->isMethod('post')){
+                $program_course = $req->all();  
+
+                // Check Ref.
+                $program = DagsProgram::where('id','=',$req['program_id'])->first();
+                if(!$program){
+                    return $res = [
+                        'success' => 'false',
+                        'msg' => 'Program not found.',
+                    ];
+                }
+                // check duplicate  code
+                $chk = DagsProgramCourse::where('program_id','=',$req['program_id'])
+                ->where('course_name','=',$req['course_name'])
+                ->where('id','<>',$req['id'])->first();
+                if($chk){
+                    return $res = [
+                        'success' => 'false',
+                        'msg' => 'Fail : Duplicate data : '
+                        .'Program : '.$program->program_name.', '
+                        .'Course : '.$req['course_name'].'.',
+                    ];
+                }
+
+                $program_course['is_calc'] = ($req['is_calc']?1:0);
+                $program_course['created_by'] = $user_id;
+                $program_course = DagsProgramCourse::create($program_course);
+                
+                $res = [
+                    'success' => 'success',
+                    'row_count' => 1,
+                    'items' => $program_course,
+                    'msg' => 'Successfully.',
+                ];
+            } // if post
+        }catch(Exception $e){
+            Log::warning(sprintf('Exception: %s', $e->getMessage()));
+
+            $res = [
+                'success' => 'false',
+                'msg' => $e->getMessage(),
+            ];
+        }         
+        return $res;
+    }
+
 }

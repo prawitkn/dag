@@ -1,4 +1,4 @@
-@extends('layouts.onlineStoreLayout.design')
+@extends('layouts.dagSchoolLayout.design')
 
 @section('head')
 @endsection
@@ -10,7 +10,7 @@
   <div class="container-fluid">
     <ul class="breadcrumb">
       <li class="breadcrumb-item"><a href="{{ url('/online_store') }}">หน้าแรก</a></li>
-      <li class="breadcrumb-item active"> ลูกค้า</li>
+      <li class="breadcrumb-item active"> รุ่นหลักสูตร</li>
     </ul>
   </div>
 </div>
@@ -20,7 +20,7 @@
   <div class="container-fluid">
     <!-- Page Header-->
     <header> 
-      <h1 class="display">เพิ่มลูกค้า
+      <h1 class="display">เพิ่มรุ่นหลักสูตร
       </h1>
 
     </header>
@@ -33,15 +33,84 @@
         <div class="card-body">
 
           <input type="hidden" id="id" value="" />
-        
-            <div class="row">
 
-              <div class="form-group col-md-6">
-                <label for="customer_name">ชื่อลูกค้า</label>
-                <input type="text" class="form-control" name="customer_name" value="" required >
-              </div><!--/.col-6-->
+          <div class="row">
+          <div class="form-group col-md-12">
+            <select name="program_name" class="form-control" required>
+            <option value=""> - หลักสูตร - </option>
+            @foreach($programs as $program)
+              <option value="{{ $program->id }}">{{ $program->program_name }}</option>
+            @endforeach
+          </select>
+          <input type="hidden" name="program_id" value="" />
+          </div><!--/.col-6-->
+        </div><!--/row-->
 
-            </div><!--/row-->
+          <div class="row"> 
+          <div class="form-group col-md-10">
+            <label for="program_class_name">ชื่อรุ่น</label>
+            <input type="text" class="form-control" name="program_class_name" value="" required >
+          </div><!--/.col-6-->
+
+          <div class="form-group col-md-2">
+            <label for="program_class_qty">จำนวนนักเรียน</label>
+            <input type="text" class="form-control" name="program_class_qty" value=""  >
+          </div><!--/.col-6-->
+        </div><!--/row-->
+
+        <div class="row">
+         <div class="form-group col-md-2">
+            <label for="course_hours">ชั่วโมง</label>
+            <input type="text" class="form-control" name="course_hours" value=""  >
+          </div><!--/.col-6-->
+
+          <div class="form-group col-md-2">
+            <label for="course_days">วัน</label>
+            <input type="text" class="form-control" name="course_days" value=""  >
+          </div><!--/.col-6-->
+
+          <div class="form-group col-md-2">
+            <label for="credit">เครดิต</label>
+            <input type="text" class="form-control" name="credit" value=""  >
+          </div><!--/.col-6-->
+        </div><!--/row-->
+
+
+
+
+        <div class="row">
+         <div class="form-group col-md-2">
+            <label for="confirm_title">คำนำหน้า</label>
+            <input type="text" class="form-control" name="confirm_title" value=""  >
+          </div><!--/.col-6-->
+
+          <div class="form-group col-md-4">
+            <label for="confirm_full_name">ชื่อ นามสกุล</label>
+            <input type="text" class="form-control" name="confirm_full_name" value=""  >
+          </div><!--/.col-6-->
+
+          <div class="form-group col-md-6">
+            <label for="confirm_position_abb">ตำแหน่ง (ผอ.กสบ.สบ.ทหาร)</label>
+            <input type="text" class="form-control" name="confirm_position_abb" value=""  >
+          </div><!--/.col-6-->
+        </div>
+
+        <div class="row">          
+          <div class="form-group col-md-2">
+            <label for="approve_title">คำนำหน้า</label>
+            <input type="text" class="form-control" name="approve_title" value=""  >
+          </div><!--/.col-6-->
+
+          <div class="form-group col-md-4">
+            <label for="approve_full_name">ชื่อ นามสกุล</label>
+            <input type="text" class="form-control" name="approve_full_name" value=""  >
+          </div><!--/.col-6-->
+
+          <div class="form-group col-md-6">
+            <label for="approve_position_abb">ตำแหน่ง (จก.สบ.ทหาร)</label>
+            <input type="text" class="form-control" name="approve_position_abb" value=""  >
+          </div><!--/.col-6-->
+        </div><!--/row-->    
       
         </div>
         <!--/.card-body-->
@@ -104,16 +173,27 @@
 $(document).ready(function(){	
 
 	function formClear(){
-		$('input[name="customer_name"]').val('');
+    $('input[name="approve_position_abb"]').val('');
+    $('input[name="approve_full_name"]').val('');
+    $('input[name="approve_title"]').val('');
+    $('input[name="confirm_position_abb"]').val('');
+    $('input[name="confirm_full_name"]').val('');
+    $('input[name="confirm_title"]').val('');
+    $('input[name="credit"]').val('0');
+    $('input[name="course_days"]').val('0');
+    $('input[name="course_hours"]').val('0');
+    $('input[name="program_class_qty"]').val('0');
+    $('input[name="program_class_name"]').val('');
 
-    $('input[name="customer_name"]').select();
-	}
-	
-	formClear();
+    $('input[name="program_class_name"]').select();
+  }
 
-    $('a[name="btn_clear"]').click(function(e){  
-      formClear();
-    }); // click
+  // formClear();
+  $('input[name="program_class_name"]').select();
+
+  $('a[name="btn_clear"]').click(function(e){  
+    formClear();
+  }); // click
 
   $('#frm1').submit(function(e){ 
     e.preventDefault(); // For Form Valid and not use default href link
@@ -126,7 +206,7 @@ $(document).ready(function(){
       headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
     }); 
     $.ajax({
-      url: "{{ url('/online_store/customers/create') }}",
+      url: "{{ url('/dag_school/program-classes/create') }}",
       type: 'post', dataType:"json", data: params,
       success: function (res) { console.log(res);
         if(res.success=="success"){
@@ -144,6 +224,9 @@ $(document).ready(function(){
     }); // /.ajax   
   }); // click
 
+  $('select[name="program_name"]').change(function(e){ 
+      $('input[name="program_id"]').val($('select[name="program_name"] option').filter(":selected").val());  
+  }); // change
 });
 
 </script>

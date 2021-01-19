@@ -1,4 +1,4 @@
-@extends('layouts.onlineStoreLayout.design')
+@extends('layouts.dagSchoolLayout.design')
 
 @section('head')
 @endsection
@@ -10,7 +10,7 @@
   <div class="container-fluid">
     <ul class="breadcrumb">
       <li class="breadcrumb-item"><a href="{{ url('/dag_school') }}">หน้าแรก</a></li>
-      <li class="breadcrumb-item active"> กลุ่มหลักวิชา</li>
+      <li class="breadcrumb-item active"> หลักสูตรการศึกษา</li>
     </ul>
   </div>
 </div>
@@ -20,7 +20,7 @@
   <div class="container-fluid">
     <!-- Page Header-->
     <header> 
-      <h1 class="display">เพิ่มกลุ่มหลักวิชา
+      <h1 class="display">เพิ่มหลักสูตรการศึกษา
       </h1>
 
     </header>
@@ -36,9 +36,9 @@
         
             <div class="row">
 
-              <div class="form-group col-md-6">
-                <label for="main_course_name">ชื่อกลุ่มหลักวิชา</label>
-                <input type="text" class="form-control" name="main_course_name" value="" required >
+              <div class="form-group col-md-12">
+                <label for="program_name">ชื่อหลักสูตรการศึกษา</label>
+                <input type="text" class="form-control" name="program_name" value="" required >
               </div><!--/.col-6-->
 
             </div><!--/row-->
@@ -126,7 +126,7 @@ $(document).ready(function(){
       headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
     }); 
     $.ajax({
-      url: "{{ url('/dag_school/main_course_name/create') }}",
+      url: "{{ url('/dag_school/programs/create') }}",
       type: 'post', dataType:"json", data: params,
       success: function (res) { console.log(res);
         if(res.success=="success"){

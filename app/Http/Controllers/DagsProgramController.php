@@ -91,4 +91,48 @@ class DagsProgramController extends Controller
         }         
         return $res;
     }
+
+    public function new_view()
+    {   
+        return view('dag_school.programs.new');
+    }
+
+    public function create(Request $req){
+        $res = [];      
+        $user_id = Auth::user()->id;
+        try{
+            if($req->isMethod('post')){
+                $program = $req->all();  
+
+                // check duplicate  code
+                $chk = DagsProgram::where('program_name','=',$req['program_name'])
+                ->where('id','<>',$req['id'])->first();
+                if($chk){
+                    return $res = [
+                        'success' => 'false',
+                        'msg' => 'Fail : Duplicate data : '
+                        .'Program : '.$program->program_name.', '
+                    ];
+                }
+
+                $program['created_by'] = $user_id;
+                $program = DagsProgram::create($program);
+                
+                $res = [
+                    'success' => 'success',
+                    'row_count' => 1,
+                    'items' => $program,
+                    'msg' => 'Successfully.',
+                ];
+            } // if post
+        }catch(Exception $e){
+            Log::warning(sprintf('Exception: %s', $e->getMessage()));
+
+            $res = [
+                'success' => 'false',
+                'msg' => $e->getMessage(),
+            ];
+        }         
+        return $res;
+    }
 }

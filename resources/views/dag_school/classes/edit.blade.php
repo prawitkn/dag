@@ -12,7 +12,7 @@
   <div class="container-fluid">
     <ul class="breadcrumb">
       <li class="breadcrumb-item"><a href="{{ url('/online_store') }}">หน้าแรก</a></li>
-      <li class="breadcrumb-item active">วิชาหลักสูตร</li>
+      <li class="breadcrumb-item active">รุ่นหลักสูตร</li>
     </ul>
   </div>
 </div>
@@ -22,7 +22,7 @@
   <div class="container-fluid">
     <!-- Page Header-->
     <header> 
-      <h1 class="display">วิชาหลักสูตร : <b>วิชา {{ $program_course->course_name }}</b>
+      <h1 class="display">รุ่นหลักสูตร : <b>{{ $program_class->program_class_name }}</b>
       </h1>
       
 
@@ -32,15 +32,15 @@
       <div class="col-md-12">
 
     <div class="card">
-    <form id="frm1" method="POST" action="">
+    <form id="frm1" action="">
       <div class="card-body">
                         @csrf
-        <input type="hidden" name="id" value="{{ $program_course->id }}" />
+        <input type="hidden" name="id" value="{{ $program_class->id }}" />
                               
         <div class="row">
           <div class="form-group col-md-3">
             <input type="checkbox" name="status" id="status" data-toggle="toggle" data-size="mini" 
-            @if( $program_course->status ) checked @endif
+            @if( $program_class->status ) checked @endif
             >
             ใช้งาน 
             
@@ -48,39 +48,84 @@
         </div>
 
         <div class="row">
-         <!--  `course_hierarchy`, `course_no`, `course_name`, `course_description`, `course_hours`, `credit` -->
-         <div class="form-group col-md-2">
-            <label for="course_hierarchy">Course hierarchy</label>
-            <input type="text" class="form-control" name="course_hierarchy" value="{{ $program_course->course_hierarchy }}" required >
-          </div><!--/.col-6-->
-          <div class="form-group col-md-2">
-            <label for="course_no">ลำดับ</label>
-            <input type="text" class="form-control" name="course_no" value="{{ $program_course->course_no }}"  >
-          </div><!--/.col-6-->
-          <div class="form-group col-md-4">
-            <label for="course_name">ชื่อวิชา</label>
-            <input type="text" class="form-control" name="course_name" value="{{ $program_course->course_name }}" required >
-          </div><!--/.col-6-->
-          <div class="form-group col-md-4">
-            <label for="course_description">รายละเอียด</label>
-            <input type="text" class="form-control" name="course_description" value="{{ $program_course->course_description }}"  >
+          <div class="form-group col-md-12">
+            <select name="program_name" class="form-control" required>
+            <option value=""> - หลักสูตร - </option>
+            @foreach($programs as $program)
+              <option value="{{ $program->id }}"
+                @if( $program->id == $program_class->program_id ) selected @endif 
+                >{{ $program->program_name }}</option>
+            @endforeach
+          </select>
+          <input type="hidden" name="program_id" value="{{ $program_class->program_id }}" />
           </div><!--/.col-6-->
         </div><!--/row-->
 
         <div class="row">
-         <!--  `course_hierarchy`, `course_no`, `course_name`, `course_description`, `course_hours`, `credit` -->
-         <div class="form-group col-md-2">
-            <label for="course_hours">ชั่วโมง</label>
-            <input type="text" class="form-control" name="course_hours" value="{{ $program_course->course_hours }}"  >
+          <div class="form-group col-md-10">
+            <label for="program_class_name">ชื่อรุ่น</label>
+            <input type="text" class="form-control" name="program_class_name" value="{{ $program_class->program_class_name }}" required >
           </div><!--/.col-6-->
+
           <div class="form-group col-md-2">
-            <label for="credit">เครดิต</label>
-            <input type="text" class="form-control" name="credit" value="{{ $program_course->credit }}"  >
+            <label for="program_class_qty">จำนวนนักเรียน</label>
+            <input type="text" class="form-control" name="program_class_qty" value="{{ $program_class->program_class_qty }}"  >
           </div><!--/.col-6-->
         </div><!--/row-->
 
-	      <!-- Submit-->
-	      
+        <div class="row">
+         <div class="form-group col-md-2">
+            <label for="course_hours">ชั่วโมง</label>
+            <input type="text" class="form-control" name="course_hours" value="{{ $program_class->course_hours }}"  >
+          </div><!--/.col-6-->
+
+          <div class="form-group col-md-2">
+            <label for="course_days">วัน</label>
+            <input type="text" class="form-control" name="course_days" value="{{ $program_class->course_days }}"  >
+          </div><!--/.col-6-->
+
+          <div class="form-group col-md-2">
+            <label for="credit">เครดิต</label>
+            <input type="text" class="form-control" name="credit" value="{{ $program_class->credit }}"  >
+          </div><!--/.col-6-->
+        </div><!--/row-->
+
+
+
+
+        <div class="row">
+         <div class="form-group col-md-2">
+            <label for="confirm_title">คำนำหน้า</label>
+            <input type="text" class="form-control" name="confirm_title" value="{{ $program_class->confirm_title }}"  >
+          </div><!--/.col-6-->
+
+          <div class="form-group col-md-4">
+            <label for="confirm_full_name">ชื่อ นามสกุล</label>
+            <input type="text" class="form-control" name="confirm_full_name" value="{{ $program_class->confirm_full_name }}"  >
+          </div><!--/.col-6-->
+
+          <div class="form-group col-md-6">
+            <label for="confirm_position_abb">ตำแหน่ง (ผอ.กสบ.สบ.ทหาร)</label>
+            <input type="text" class="form-control" name="confirm_position_abb" value="{{ $program_class->confirm_position_abb }}"  >
+          </div><!--/.col-6-->
+        </div>
+
+        <div class="row">          
+          <div class="form-group col-md-2">
+            <label for="approve_title">คำนำหน้า</label>
+            <input type="text" class="form-control" name="approve_title" value="{{ $program_class->approve_title }}"  >
+          </div><!--/.col-6-->
+
+          <div class="form-group col-md-4">
+            <label for="approve_full_name">ชื่อ นามสกุล</label>
+            <input type="text" class="form-control" name="approve_full_name" value="{{ $program_class->approve_full_name }}"  >
+          </div><!--/.col-6-->
+
+          <div class="form-group col-md-6">
+            <label for="approve_position_abb">ตำแหน่ง (จก.สบ.ทหาร)</label>
+            <input type="text" class="form-control" name="approve_position_abb" value="{{ $program_class->approve_position_abb }}"  >
+          </div><!--/.col-6-->
+        </div><!--/row-->	      
       </div>
       <!--/.card-body-->
 
@@ -150,13 +195,23 @@ $(document).ready(function(){
   })
 
   function formClear(){
-    $('input[name="customer_name"]').val('');
+    $('input[name="approve_position_abb"]').val('');
+    $('input[name="approve_full_name"]').val('');
+    $('input[name="approve_title"]').val('');
+    $('input[name="confirm_position_abb"]').val('');
+    $('input[name="confirm_full_name"]').val('');
+    $('input[name="confirm_title"]').val('');
+    $('input[name="credit"]').val('0');
+    $('input[name="course_days"]').val('0');
+    $('input[name="course_hours"]').val('0');
+    $('input[name="program_class_qty"]').val('0');
+    $('input[name="program_class_name"]').val('');
 
-    $('input[name="customer_name"]').select();
+    $('input[name="program_class_name"]').select();
   }
 
 	// formClear();
-  $('input[name="customer_name"]').select();
+  $('input[name="program_class_name"]').select();
 
   $('a[name="btn_clear"]').click(function(e){  
     formClear();
@@ -173,13 +228,13 @@ $(document).ready(function(){
           headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
       }); 
       $.ajax({
-        url: "{{ url('/dag_school/program-courses/update') }}",
+        url: "{{ url('dag_school/program-classes/update') }}",
         type: 'post', dataType:"json", data: params,
         success: function (res) { 
             console.log(res);
             if(res.success=="success"){
            alert(res.msg);
-             location.reload();
+             // location.reload();
             }else{
              alert(res.msg);                
             } 
@@ -192,7 +247,9 @@ $(document).ready(function(){
       }); // /.ajax   
   }); // click
 
-
+  $('select[name="program_name"]').change(function(e){ 
+      $('input[name="program_id"]').val($('select[name="program_name"] option').filter(":selected").val());  
+  }); // change
 });
 
 </script>

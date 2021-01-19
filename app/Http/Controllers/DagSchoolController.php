@@ -110,6 +110,7 @@ class DagSchoolController extends Controller
                 $join->on('b.program_id','=','a.program_id');
                 $join->where('b.is_calc','=',1);
             })
+            ->where('a.id','=',$req['program_class_id'])
             ->select('a.id','a.program_class_name'
                 ,'b.id as program_course_id', 'b.course_name as program_course_name', 'b.score as course_scoure' )->get();
 
@@ -230,7 +231,7 @@ class DagSchoolController extends Controller
         foreach($res['items'] as $key => $item){
             if($rowPerPage==0){
                 PDF::AddPage('P', 'A4');
-                PDF::SetFont('freeserif', '', 10, '', true);
+                PDF::SetFont('THSarabun', '', 14, '', true);
                 PDF::Cell(0, 5, PDF::getAliasNumPage().'/'.PDF::getAliasNbPages(), 0, false, 'R', 0, '', 0, false, 'T', 'M');                
                 PDF::Ln(7);
 
@@ -343,10 +344,8 @@ class DagSchoolController extends Controller
             // set default font subsetting mode
             PDF::setFontSubsetting(true);
 
-
-            PDF::SetFont('freeserif', '', 16, '', true);
+            PDF::SetFont('THSarabun', '', 14, '', true);
             //
-            PDF::SetFont('freeserif', '', 10, '', true);
             PDF::Cell(0, 5, PDF::getAliasNumPage().'/'.PDF::getAliasNbPages(), 0, false, 'R', 0, '', 0, false, 'T', 'M');
 
             PDF::Ln();
@@ -360,7 +359,7 @@ class DagSchoolController extends Controller
                 $tmp = '<div style="background-image: url('.$file.')" class="media-object avatar avatar-md mr-3"></div>';
                 if($rowPerPage==0){
                     PDF::AddPage('P', 'A4');
-                    PDF::SetFont('freeserif', '', 12, '', true);
+                    PDF::SetFont('THSarabun', '', 14, '', true);
                     // PDF::Cell(0, 5, PDF::getAliasNumPage().'/'.PDF::getAliasNbPages(), 0, false, 'R', 0, '', 0, false, 'T', 'M');                
                     PDF::Ln();
                     $x=$y=0;
@@ -468,6 +467,8 @@ class DagSchoolController extends Controller
                     PDF::writeHTMLCell(0, 0, '', '', $html, 0, 1, 0, true, '', true);
                     $html =''; $rowPerPage=0;
                 }
+
+                $y-=$yHeight;
                 $x=20;              
                 PDF::writeHTMLCell(200, $yHeight, $x, $y, '<b style="text-align: left;">คะแนนเฉลี่ยสะสม  </b>', $border = $isBorder, $ln = 0, $align = '', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M' ); 
                 $y+=$yHeight;
@@ -477,14 +478,39 @@ class DagSchoolController extends Controller
                 $y+=$yHeight;
 
                 $x=20;              // 230
-                PDF::writeHTMLCell(180, $yHeight, $x, $y, '........................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................', $border = $isBorder, $ln = 0, $align = '', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M' ); 
-                $y+=$yHeight;
+                // PDF::writeHTMLCell(180, $yHeight, $x, $y, '........................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................', $border = $isBorder, $ln = 0, $align = '', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M' ); 
+                PDF::writeHTMLCell(180, $yHeight, $x, $y, '................................................................................................................................................................................................................................................................................................................................................', $border = $isBorder, $ln = 0, $align = '', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M' ); 
                 $y+=$yHeight;
                 $y+=$yHeight;
 
                 $x=20;              
                 PDF::writeHTMLCell(200, $yHeight, $x, $y, '<b style="text-align: left;"><span style="text-decoration-line: underline;">ตอนที่ 4</span> : ผลการฝึกอบรม</b>', $border = $isBorder, $ln = 0, $align = '', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M' );
-                
+
+
+
+
+
+
+                $isBorder=0;
+                // Sign $x = 180
+                $x=20; 
+                $y+=$yHeight;
+                PDF::writeHTMLCell(30, $yHeight, $x, $y, $header->confirm_title, $border = $isBorder, $ln = 0, $align = '', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'C', $valign = 'M' );          
+                $x+=30;$x+=60;
+                PDF::writeHTMLCell(30, $yHeight, $x, $y,  $header->approve_title, $border = $isBorder, $ln = 0, $align = '', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M' );
+
+                $x=20; 
+                $y+=$yHeight;$y+=($yHeight/2);
+                PDF::writeHTMLCell(90, $yHeight, $x, $y, '('.$header->confirm_full_name.')', $border = $isBorder, $ln = 0, $align = '', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M' );
+                $x+=90;
+                PDF::writeHTMLCell(90, $yHeight, $x, $y, '('.$header->approve_full_name.')', $border = $isBorder, $ln = 0, $align = '', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M' );
+
+                $x=20; 
+                $y+=$yHeight;
+                PDF::writeHTMLCell(90, $yHeight, $x, $y,  $header->confirm_position_abb, $border = $isBorder, $ln = 0, $align = '', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M' );
+                $x+=90;
+                PDF::writeHTMLCell(90, $yHeight, $x, $y,  $header->approve_position_abb, $border = $isBorder, $ln = 0, $align = '', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M' );
+
             }   // end foreach 
             
 

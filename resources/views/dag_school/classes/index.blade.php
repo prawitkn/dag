@@ -23,7 +23,7 @@
   <div class="container-fluid">
     <ul class="breadcrumb">
       <li class="breadcrumb-item"><a href="{{ url('/online_store') }}">หน้าแรก</a></li>
-      <li class="breadcrumb-item active">รุ่นการศึกษา</li>
+      <li class="breadcrumb-item active">รุ่นหลักสูตร</li>
     </ul>
   </div>
 </div>
@@ -48,8 +48,8 @@
       
     <!-- Page Header-->
     <header> 
-      <h1 class="display">รุ่นการศึกษา
-	 <!--  &nbsp;<a href="{{ url('online_store/customers/new') }}" class="btn btn-primary shadow rounded" name="btn_add" /> เพิ่ม</a> -->
+      <h1 class="display">รุ่นหลักสูตร	 
+    &nbsp;<a href="{{ url('dag_school/program-classes/new') }}" class="btn btn-primary shadow rounded" name="btn_add" /> เพิ่ม</a>
       </h1>
       
 

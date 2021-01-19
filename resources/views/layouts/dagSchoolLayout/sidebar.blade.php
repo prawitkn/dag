@@ -29,7 +29,7 @@
       </ul>        
     </div> -->
 
-    @if(!Auth::user()->isOnlineStoreCustomer())     
+ 
     <div class="sales-manager-menu">
       <h5 class="sidenav-heading">ข้อมูล</h5></h5>
       <ul id="side-sales-manager-menu" class="side-menu list-unstyled"> 
@@ -38,11 +38,11 @@
         @endif
         @if(Auth::user()->isAdmin() || Auth::user()->isOnlineStoreSalesAdmin())    
         <li> <a href="{{ url('dag_school/programs/view-list') }}"><i class="icon-screen"> </i>ข้อมูลหลักสูตร</a></li>
-        <li> <a href="{{ url('dag_school/program-courses/view-list') }}"><i class="icon-screen"> </i>ข้อมูลวิชา โดยหลักสูตร</a></li>
-        <li> <a href="{{ url('dag_school/program-classes/view-list') }}"><i class="icon-screen"> </i>ข้อมูลรุ่นหลักสูตร โดยหลักสูตร</a></li>
+        <li> <a href="{{ url('dag_school/program-classes/view-list') }}"><i class="icon-screen"> </i>ข้อมูลรุ่นหลักสูตร </a></li>
+        <li> <a href="{{ url('dag_school/program-courses/view-list') }}"><i class="icon-screen"> </i>ข้อมูลวิชา </a></li>
+        <li> <a href="{{ url('dag_school/program-course-tests/view-list') }}"><i class="icon-screen"> </i>ข้อมูลแบบทดสอบ</a></li>  
         <li> <a href="{{ url('dag_school/students/view-list') }}"><i class="icon-screen"> </i>ข้อมูลนักเรียน</a></li>  
-        <li> <a href="{{ url('dag_school/class-students/view-list') }}"><i class="icon-screen"> </i>ข้อมูลนักเรียน โดยรุ่นหลักสูตร</a></li>  
-        <li> <a href="{{ url('dag_school/program-course-tests/view-list') }}"><i class="icon-screen"> </i>ข้อมูลแบบทดสอบ โดยวิชาของหลักสูตร</a></li>  
+        <li> <a href="{{ url('dag_school/class-students/view-list') }}"><i class="icon-screen"> </i>ข้อมูลนักเรียนของรุ่น</a></li>  
 
        <!--  <li> <a href="{{ url('dag_school/courses/view-list') }}"><i class="icon-screen"> </i>ข้อมูลกลุ่มวิชา</a></li>
         <li> <a href="{{ url('dag_school') }}"><i class="icon-screen"> </i>ข้อมูลวิชา</a></li>
@@ -60,12 +60,19 @@
         @if(Auth::user()->isAdmin() || Auth::user()->isOnlineStoreSalesAdmin())   
         <li> <a href="{{ url('dag_school') }}"><i class="icon-screen"> </i>เปิดหลักสูตร</a></li>
         <li> <a href="{{ url('dag_school') }}"><i class="icon-screen"> </i>บักทึกผลแบบทดสอบ</a></li>
-        <li> <a href="{{ url('dag_school') }}"><i class="icon-screen"> </i>รายงาน</a></li>
-        <li> <a href="{{ url('dag_school') }}"><i class="icon-screen"> </i>ออกใบประกาศฯ</a></li>
         @endif
       </ul>
     </div>
-    @endif    
-  </div>
+
+   @if(Auth::user()->isAdmin() || Auth::user()->isOnlineStoreSalesAdmin())  
+   <div class="sales-manager-menu">
+      <h5 class="sidenav-heading">รายงาน</h5></h5>
+      <ul id="side-sales-manager-menu" class="side-menu list-unstyled"> 
+        <li> <a href="{{ url('dag_school') }}"><i class="icon-article"> </i>รายงาน</a></li>
+        <li> <a href="{{ url('dag_school') }}"><i class="icon-article"> </i>ออกใบประกาศฯ</a></li>
+      </ul>
+    </div>
+
+        @endif
 </nav>
 <!-- navbar-->

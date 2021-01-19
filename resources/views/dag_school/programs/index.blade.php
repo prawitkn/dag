@@ -49,7 +49,7 @@
     <!-- Page Header-->
     <header> 
       <h1 class="display">รายการหลักสูตรการศึกษา
-	 <!--  &nbsp;<a href="{{ url('online_store/customers/new') }}" class="btn btn-primary shadow rounded" name="btn_add" /> เพิ่ม</a> -->
+	  &nbsp;<a href="{{ url('dag_school/programs/new') }}" class="btn btn-primary shadow rounded" name="btn_add" /> เพิ่ม</a>
       </h1>
       
 
@@ -94,7 +94,6 @@
 
 <script type="text/javascript">
 $(document).ready(function(){
-      
 
     var tbl_main; // = $('#table').DataTable();
     function getList(){

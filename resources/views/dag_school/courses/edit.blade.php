@@ -38,13 +38,35 @@
         <input type="hidden" name="id" value="{{ $program_course->id }}" />
                               
         <div class="row">
+
           <div class="form-group col-md-3">
             <input type="checkbox" name="status" id="status" data-toggle="toggle" data-size="mini" 
             @if( $program_course->status ) checked @endif
             >
-            ใช้งาน 
-            
+            ใช้งาน             
           </div><!--/.col-->
+
+          <div class="form-group col-md-3">
+            <input type="checkbox" name="is_calc" id="is_calc" data-toggle="toggle" data-size="mini" 
+            @if( $program_course->is_calc ) checked @endif
+            >
+            ใช้คำนวณผลการเรียน             
+          </div><!--/.col-->
+
+        </div>
+
+        <div class="row">
+          <div class="col-md-12">
+            <select name="program_name" class="form-control" required>
+              <option value=""> - หลักสูตร - </option>
+              @foreach($programs as $program)
+                <option value="{{$program->id}}"
+                  @if( $program->id == $program_course->program_id ) selected @endif
+                  >{{$program->program_name}}</option>
+              @endforeach
+            </select>
+            <input type="hidden" name="program_id" value="" />
+          </div>
         </div>
 
         <div class="row">
@@ -77,6 +99,9 @@
             <label for="credit">เครดิต</label>
             <input type="text" class="form-control" name="credit" value="{{ $program_course->credit }}"  >
           </div><!--/.col-6-->
+
+          
+
         </div><!--/row-->
 
 	      <!-- Submit-->
@@ -148,15 +173,30 @@ $(document).ready(function(){
     //   $('select[name="pos_branch_name"]').prop('disabled',true);
     // }
   })
+  $('#is_calc').bootstrapToggle();
+  $('#is_calc').change(function() {
+    // if($(this).is(':checked')){
+    //   $('select[name="pos_group_name"]').prop('disabled','');
+    //   $('select[name="pos_branch_name"]').prop('disabled','');
+    // }else{
+    //   $('select[name="pos_group_name"]').prop('disabled',true);
+    //   $('select[name="pos_branch_name"]').prop('disabled',true);
+    // }
+  })
 
   function formClear(){
-    $('input[name="customer_name"]').val('');
+    $('input[name="credit"]').val('0');
+    $('input[name="course_hours"]').val('0');
+    $('input[name="course_description"]').val('');
+    $('input[name="course_name"]').val('');
+    $('input[name="course_no"]').val('');
+    $('input[name="course_hierarchy"]').val('');
 
-    $('input[name="customer_name"]').select();
+    $('input[name="course_hierarchy"]').select();
   }
 
 	// formClear();
-  $('input[name="customer_name"]').select();
+  $('input[name="course_hierarchy"]').select();
 
   $('a[name="btn_clear"]').click(function(e){  
     formClear();
@@ -192,7 +232,11 @@ $(document).ready(function(){
       }); // /.ajax   
   }); // click
 
-
+  $('select[name="program_name"]').on('change', function() { 
+      // alert($(this).val());
+      $('input[name="program_id"]').val($(this).val());
+      getList();
+    });
 });
 
 </script>

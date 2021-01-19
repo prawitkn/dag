@@ -49,7 +49,7 @@
     <!-- Page Header-->
     <header> 
       <h1 class="display">วิชาหลักสูตร
-	 <!--  &nbsp;<a href="{{ url('online_store/customers/new') }}" class="btn btn-primary shadow rounded" name="btn_add" /> เพิ่ม</a> -->
+	 &nbsp;<a href="{{ url('dag_school/program-courses/new') }}" class="btn btn-primary shadow rounded" name="btn_add" /> เพิ่ม</a>
       </h1>
       
 

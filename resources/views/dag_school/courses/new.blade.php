@@ -1,6 +1,8 @@
-@extends('layouts.onlineStoreLayout.design')
+@extends('layouts.dagSchoolLayout.design')
 
 @section('head')
+<link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
+<script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
 @endsection
 
 @section('content')
@@ -10,7 +12,7 @@
   <div class="container-fluid">
     <ul class="breadcrumb">
       <li class="breadcrumb-item"><a href="{{ url('/online_store') }}">หน้าแรก</a></li>
-      <li class="breadcrumb-item active"> ลูกค้า</li>
+      <li class="breadcrumb-item active"> วิชาหลักสูตร</li>
     </ul>
   </div>
 </div>
@@ -20,7 +22,7 @@
   <div class="container-fluid">
     <!-- Page Header-->
     <header> 
-      <h1 class="display">เพิ่มลูกค้า
+      <h1 class="display">เพิ่มวิชาหลักสูตร
       </h1>
 
     </header>
@@ -33,15 +35,64 @@
         <div class="card-body">
 
           <input type="hidden" id="id" value="" />
-        
-            <div class="row">
+          
+          <div class="row">
+          
+          <div class="form-group col-md-3">
+            <input type="checkbox" name="is_calc" id="is_calc" data-toggle="toggle" data-size="mini" 
+            >
+            ใช้คำนวณผลการเรียน             
+          </div><!--/.col-->
 
-              <div class="form-group col-md-6">
-                <label for="customer_name">ชื่อลูกค้า</label>
-                <input type="text" class="form-control" name="customer_name" value="" required >
-              </div><!--/.col-6-->
+        </div>
 
-            </div><!--/row-->
+        <div class="row">
+          <div class="col-md-12">
+            <select name="program_name" class="form-control" required>
+              <option value=""> - หลักสูตร - </option>
+              @foreach($programs as $program)
+                <option value="{{$program->id}}" 
+                  >{{$program->program_name}}</option>
+              @endforeach
+            </select>
+            <input type="hidden" name="program_id" value="" />
+          </div>
+        </div>
+
+        <div class="row">
+           <!--  `course_hierarchy`, `course_no`, `course_name`, `course_description`, `course_hours`, `credit` -->
+           <div class="form-group col-md-2">
+              <label for="course_hierarchy">Course hierarchy</label>
+              <input type="text" class="form-control" name="course_hierarchy" value="" required >
+            </div><!--/.col-6-->
+            <div class="form-group col-md-2">
+              <label for="course_no">ลำดับ</label>
+              <input type="text" class="form-control" name="course_no" value=""  >
+            </div><!--/.col-6-->
+            <div class="form-group col-md-4">
+              <label for="course_name">ชื่อวิชา</label>
+              <input type="text" class="form-control" name="course_name" value="" required >
+            </div><!--/.col-6-->
+            <div class="form-group col-md-4">
+              <label for="course_description">รายละเอียด</label>
+              <input type="text" class="form-control" name="course_description" value=""  >
+            </div><!--/.col-6-->
+          </div><!--/row-->
+
+          <div class="row">
+           <!--  `course_hierarchy`, `course_no`, `course_name`, `course_description`, `course_hours`, `credit` -->
+           <div class="form-group col-md-2">
+              <label for="course_hours">ชั่วโมง</label>
+              <input type="text" class="form-control" name="course_hours" value="0"  >
+            </div><!--/.col-6-->
+            <div class="form-group col-md-2">
+              <label for="credit">เครดิต</label>
+              <input type="text" class="form-control" name="credit" value="0"  >
+            </div><!--/.col-6-->
+
+            
+
+          </div><!--/row-->
       
         </div>
         <!--/.card-body-->
@@ -102,11 +153,27 @@
 <script type="text/javascript">
 
 $(document).ready(function(){	
+  $('#is_calc').bootstrapToggle();
+  $('#is_calc').change(function() {
+    // if($(this).is(':checked')){
+    //   $('select[name="pos_group_name"]').prop('disabled','');
+    //   $('select[name="pos_branch_name"]').prop('disabled','');
+    // }else{
+    //   $('select[name="pos_group_name"]').prop('disabled',true);
+    //   $('select[name="pos_branch_name"]').prop('disabled',true);
+    // }
+  })
 
 	function formClear(){
-		$('input[name="customer_name"]').val('');
+    $('input[name="credit"]').val('0');
+    $('input[name="course_hours"]').val('0');
+    $('input[name="course_description"]').val('');
+    $('input[name="course_name"]').val('');
+    $('input[name="course_no"]').val('');
+    $('input[name="course_hierarchy"]').val('');
+		$('input[name="course_hierarchy"]').val('');
 
-    $('input[name="customer_name"]').select();
+    $('input[name="course_hierarchy"]').select();
 	}
 	
 	formClear();
@@ -126,7 +193,7 @@ $(document).ready(function(){
       headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
     }); 
     $.ajax({
-      url: "{{ url('/online_store/customers/create') }}",
+      url: "{{ url('/dag_school/program-courses/create') }}",
       type: 'post', dataType:"json", data: params,
       success: function (res) { console.log(res);
         if(res.success=="success"){
@@ -143,6 +210,12 @@ $(document).ready(function(){
       }
     }); // /.ajax   
   }); // click
+
+  $('select[name="program_name"]').on('change', function() { 
+      // alert($(this).val());
+      $('input[name="program_id"]').val($(this).val());
+      getList();
+    });
 
 });
 
