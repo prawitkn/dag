@@ -1,4 +1,4 @@
-@extends('layouts.dagSchoolLayout.design')
+@extends('layouts.ossLayout.design')
 
 @section('head')
 <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">

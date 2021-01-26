@@ -12,13 +12,24 @@
 */
 Auth::routes();
 
+Route::get('','DagController@index');
+Route::get('dag_school','DagsController@index');
 
+
+Route::get('dag_school/reports/get-student_summary_list_by_class_id','DagsReportController@getStudentSummaryList');
 Route::group(['middleware' => 'auth'], function(){
+	// Route::get('dag_school','DagSchoolReportController@index');
+	// Route::get('dag_school/get-student_summary_list_by_class_id','DagSchoolController@getStudentSummaryList');
+	// Route::get('/dag_school','DagSchoolController@index');
+	// Route::get('/dag_school/student-summary-pdf','DagSchoolController@studentSummaryPdf');
+	// Route::get('/dag_school/student-certificate-pdf','DagSchoolController@studentCertificatePdf');
 
-	Route::get('dag_school/get-student_summary_list_by_class_id','DagSchoolController@getStudentSummaryList');
-	Route::get('/dag_school','DagSchoolController@index');
-	Route::get('/dag_school/student-summary-pdf','DagSchoolController@studentSummaryPdf');
-	Route::get('/dag_school/student-certificate-pdf','DagSchoolController@studentCertificatePdf');
+	Route::get('dag_school/reports/class-summary','DagsReportController@class_view');
+	// Route::get('dag_school/reports/get-student_summary_list_by_class_id','DagsReportController@getStudentSummaryList');
+	Route::get('dag_school/reports/student-summary-pdf','DagsReportController@studentSummaryPdf');
+	Route::get('dag_school/reports/student-certificate-pdf','DagsReportController@studentCertificatePdf');
+
+
 
 
 

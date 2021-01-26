@@ -1,4 +1,4 @@
-@extends('layouts.onlineStoreLayout.design')
+@extends('layouts.ossLayout.design')
 
 @section('head')
 <!-- datatable js -->
@@ -45,7 +45,7 @@
       <div class="col-md-12">
 
     <div class="card">
-      <form id="frm1" href="#">
+        <form id="frm1" method="GET">
         <div class="card-body">
 
           <input type="hidden" id="id" value="" />
@@ -53,8 +53,8 @@
             <div class="row">
               <div class="form-group col-md-2">
                 <div class="form-group-material">
-                  <input  type="text" name="issue_date" required class="input-material datepicker" data-format="yyyy-mm-dd" placeholder="">
-                  <label for="issue_date" class="label-material active">จากวันที่</label>
+                  <input  type="text" name="issue_date_from" required class="input-material datepicker" data-format="yyyy-mm-dd" placeholder="">
+                  <label for="issue_date_from" class="label-material active">จากวันที่</label>
                 </div>
                 <!--/.form-group-material-->
               </div>
@@ -207,7 +207,7 @@ $(document).ready(function(){
                   type: 'GET',
                   url: "{{ url('oss/service-data/get-report_summary') }}",
                   data: {
-                    issue_date: function() { return $('input[name="issue_date"]').val() },
+                    issue_date_from: function() { return $('input[name="issue_date_from"]').val() },
                     issue_date_to: function() { return $('input[name="issue_date_to"]').val() },
                   },
                   dataSrc: 'items',
@@ -241,14 +241,6 @@ $(document).ready(function(){
       }    
       // $('#tbl_main').fadeIn('slow');
   } //.getList()
-
-  $('a[name="btn_pdf"]').on('click', function(){
-    var $issue_date = $('input[name="issue_date"]').val();
-    var $issue_date_to = $('input[name="issue_date_to"]').val();
-       
-    window.open('{{url('/oss/service-data/get-report_summary_pdf')}}?issue_date='+$issue_date+'&issue_date_to='+$issue_date_to);
-
-  });
 
   $('a[name="btn_submit"').on('click', function() { 
     getList();
@@ -331,6 +323,10 @@ $(document).ready(function(){
      $('select[name="service_topic_name"]').on('change', function() { 
       // alert($(this).val());
       $('input[name="service_topic_id"]').val($(this).val());
+    });
+
+    $('a[name="btn_pdf"]').click(function(e){
+      window.open( "{{ url('oss/service-data/get-report_summary_pdf') }}" + '?' + $('#frm1').serialize(), 'Blank' );
     });
 });
 

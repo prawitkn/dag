@@ -47,7 +47,7 @@
 
     <!-- Page Header-->
     <header> 
-      <h3 class="display">หน้าแรก
+      <h3 class="display">รายงาน
       </h3>
       
 
@@ -186,7 +186,7 @@ $(document).ready(function(){
                 fixedHeader: true,
                 ajax: {
                     type: 'GET',
-                  url: "{{ url('/dag_school/get-student_summary_list_by_class_id/') }}",
+                  url: "{{ url('/dag_school/reports/get-student_summary_list_by_class_id') }}",
                     data: {
                         program_class_id: function() { return $('input[name="program_class_id"]').val() },
                     },
@@ -237,11 +237,11 @@ $(document).ready(function(){
   }); // change
 
   $('a[name="btn_pdf"]').click(function(){
-      window.open( "{{ url('dag_school/student-summary-pdf') }}" + '?type=date&' + $('#frm1').serialize(), 'Blank' );
+      window.open( "{{ url('dag_school/reports/student-summary-pdf') }}" + '?type=date&' + $('#frm1').serialize(), 'Blank' );
   });
 
   $('a[name="btn_certificate"]').click(function(){
-      window.open( "{{ url('dag_school/student-certificate-pdf') }}" + '?type=date&' + $('#frm1').serialize(), 'Blank' );
+      window.open( "{{ url('dag_school/reports/student-certificate-pdf') }}" + '?type=date&' + $('#frm1').serialize(), 'Blank' );
   });
   
 });

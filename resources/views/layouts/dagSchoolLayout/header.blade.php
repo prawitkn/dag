@@ -2,7 +2,7 @@
     <nav class="navbar">
       <div class="container-fluid">
         <div class="navbar-holder d-flex align-items-center justify-content-between">
-          <div class="navbar-header"><a id="toggle-btn" href="#" class="menu-btn"><i class="icon-bars"> </i></a><a href="{{ url('dags') }}" class="navbar-brand">
+          <div class="navbar-header"><a id="toggle-btn" href="#" class="menu-btn"><i class="icon-bars"> </i></a><a href="{{ url('dag_school') }}" class="navbar-brand">
               <div class="brand-text d-none d-md-inline-block"><span></span><strong class="text-primary">DAG School</strong></div></a>
 					</div>
 			
@@ -73,9 +73,9 @@
 					<a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>
 				</li>
 				@if (Route::has('register'))
-					<li class="nav-item">
+				<!-- 	<li class="nav-item">
 						<a class="nav-link" href="{{ route('register') }}">{{ __('Register') }}</a>
-					</li>
+					</li> -->
 				@endif
 			@else
 				<li class="nav-item dropdown">

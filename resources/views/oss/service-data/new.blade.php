@@ -1,4 +1,4 @@
-@extends('layouts.onlineStoreLayout.design')
+@extends('layouts.ossLayout.design')
 
 @section('head')
 @endsection

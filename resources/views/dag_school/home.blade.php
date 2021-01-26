@@ -87,8 +87,7 @@
       </div>
       <!--/.table-responsive-->
       <footer>
-          &nbsp;<a target="_blank" name="btn_pdf" class="btn btn-sm btn-primary shadow rounded text-white" > นำออก PDF</a>
-          &nbsp;<a target="_blank" name="btn_certificate" class="btn btn-sm btn-primary shadow rounded text-white" > ใบประกาศ</a>
+
       </footer>
   </div>
   <!--/.container-fluid-->
@@ -186,7 +185,7 @@ $(document).ready(function(){
                 fixedHeader: true,
                 ajax: {
                     type: 'GET',
-                  url: "{{ url('/dag_school/get-student_summary_list_by_class_id/') }}",
+                  url: "{{ url('dag_school/reports/get-student_summary_list_by_class_id') }}",
                     data: {
                         program_class_id: function() { return $('input[name="program_class_id"]').val() },
                     },
@@ -235,14 +234,6 @@ $(document).ready(function(){
       $('input[name="program_class_id"]').val($('select[name="program_class_name"] option').filter(":selected").val());  
     getList();
   }); // change
-
-  $('a[name="btn_pdf"]').click(function(){
-      window.open( "{{ url('dag_school/student-summary-pdf') }}" + '?type=date&' + $('#frm1').serialize(), 'Blank' );
-  });
-
-  $('a[name="btn_certificate"]').click(function(){
-      window.open( "{{ url('dag_school/student-certificate-pdf') }}" + '?type=date&' + $('#frm1').serialize(), 'Blank' );
-  });
   
 });
 </script>

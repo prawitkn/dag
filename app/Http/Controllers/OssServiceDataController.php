@@ -130,8 +130,8 @@ class OssServiceDataController extends Controller
 		
 		$tmp = $req->all();
 		try{
-			$issue_date = str_replace('/', '-', $req['issue_date']);
-			$issue_date = date('Y-m-d', strtotime($issue_date));
+			$issue_date_from = str_replace('/', '-', $req['issue_date_from']);
+			$issue_date_from = date('Y-m-d', strtotime($issue_date_from));
 			$issue_date_to = str_replace('/', '-', $req['issue_date_to']);
 			$issue_date_to = date('Y-m-d', strtotime($issue_date_to));
 			
@@ -143,10 +143,10 @@ class OssServiceDataController extends Controller
 				,'b.service_type_name','c.service_topic_name'
 				,DB::raw('count(a.id) as service_count'))
 			->where('a.status','=',1)
-			->whereBetween('a.issue_date', [$issue_date, $issue_date_to])
+			->whereBetween('a.issue_date', [$issue_date_from, $issue_date_to])
 			->groupBy('a.service_type_id','a.service_topic_id','a.remark'
 				,'b.service_type_name','c.service_topic_name')
-			->get();
+			->get();	
 
 			$res = [
 				'success'=> 'success',
@@ -182,11 +182,17 @@ class OssServiceDataController extends Controller
 	public function report_summary_pdf(Request $req){
 		// $from_location = PdLocation::find($hdr->from_location_id)->first();
 		// $to_location = PdLocation::find($hdr->to_location_id)->first();
-		$issue_date = str_replace('/', '-', $req['issue_date']);
-		$issue_date = date('Y-m-d', strtotime($issue_date));
+		$issue_date_from = str_replace('/', '-', $req['issue_date_from']);
+		$issue_date_from = date('Y-m-d', strtotime($issue_date_from));
 		$issue_date_to = str_replace('/', '-', $req['issue_date_to']);
 		$issue_date_to = date('Y-m-d', strtotime($issue_date_to));
 		
+		$date_str="";
+		if( $issue_date_from != $issue_date_to ){
+			$date_str = $issue_date_from." ถึง ".$issue_date_to;
+		}else{
+			$date_str = $issue_date_from;
+		}
 		// $service_data->save();		
 
 		$service_types = OssServiceType::where('status','=',1)->get();
@@ -197,37 +203,40 @@ class OssServiceDataController extends Controller
                  $join->on('b.service_type_id','=','a.id');
              })
 		->select('a.id', 'b.service_topic_name'
-			, DB::RAW('(SELECT COUNT(x.id) FROM oss_service_data as x 
+			, DB::RAW("(SELECT COUNT(x.id) FROM oss_service_data as x 
 				WHERE x.status=1 
+				AND x.issue_date BETWEEN '".$issue_date_from."' AND '".$issue_date_to."'
 				AND x.service_topic_id=b.id
-				AND x.customer_type_id=1) as count_1')
-			, DB::RAW('(SELECT COUNT(x.id) FROM oss_service_data as x 
+				AND x.customer_type_id=1
+				) as count_1")
+			, DB::RAW("(SELECT COUNT(x.id) FROM oss_service_data as x 
 				WHERE x.status=1 
+				AND x.issue_date BETWEEN '".$issue_date_from."' AND '".$issue_date_to."'
 				AND x.service_topic_id=b.id
-				AND x.customer_type_id=2) as count_2')
-			, DB::RAW('(SELECT COUNT(x.id) FROM oss_service_data as x 
+				AND x.customer_type_id=2) as count_2")
+			, DB::RAW("(SELECT COUNT(x.id) FROM oss_service_data as x 
 				WHERE x.status=1 
+				AND x.issue_date BETWEEN '".$issue_date_from."' AND '".$issue_date_to."'
 				AND x.service_topic_id=b.id
-				AND x.customer_type_id=3) as count_3')
+				AND x.customer_type_id=3) as count_3")
 		)
 		->where('a.status','=',1)
 		->where('a.id','<>',3)
-		// ->whereBetween('a.issue_date', [$issue_date, $issue_date_to])
 		// ->groupBy('a.service_type_id','a.service_topic_id','a.remark'
 		// 	,'b.service_type_name','c.service_topic_name')
 		->get();	
 
 		$complains = DB::table('oss_service_types as a')
-		->join('oss_service_data as b', function($join)
+		->join('oss_service_data as b', function($join) use ($issue_date_from, $issue_date_to)
              {
                  $join->on('b.service_type_id','=','a.id');
+                 $join->whereBetween('b.issue_date', [$issue_date_from, $issue_date_to]);
              })
 		->select('a.id'
 			,'b.service_type_id','b.customer_type_id', 'b.remark'
 		)
 		->where('a.status','=',1)
 		->where('a.id','=',3)
-		// ->whereBetween('a.issue_date', [$issue_date, $issue_date_to])
 		// ->groupBy('a.service_type_id','a.service_topic_id','a.remark'
 		// 	,'b.service_type_name','c.service_topic_name')
 		->get();	
@@ -243,7 +252,7 @@ class OssServiceDataController extends Controller
 
 		// PDF::SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
 
-		$pdf::setMargins(0, 0, 0);	
+		$pdf::setMargins(15, 10, 10);	
 		$pdf::SetPrintHeader(false);
 		$pdf::SetPrintFooter(false);
 
@@ -255,50 +264,10 @@ class OssServiceDataController extends Controller
 		$pdf::setImageScale(PDF_IMAGE_SCALE_RATIO);
 
 		// $pdf::SetFont('THSarabun', '', 12, '', true);
-		$pdf::SetFont('freeserif', '', 12, '', true);
+		$pdf::SetFont('THSarabun', '', 14, '', true);
 		// $pdf::SetFont('dejavusans', '', 12, '', true);
 		$pdf::AddPage('P');
-
-		// PDF::SetMargins(20, 20, 10);
-		// PDF::SetHeaderMargin(PDF_MARGIN_HEADER);
-		// PDF::SetFooterMargin(PDF_MARGIN_FOOTER);		
-		// // set auto page breaks
-		// PDF::SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
-		// // set image scale factor
-		// PDF::setImageScale(PDF_IMAGE_SCALE_RATIO);
-
-		// PDF::AddPage('L', 'A4');
-
-		// //
-		// PDF::SetFont('Times', '', 10, '', true);
-		// PDF::Cell(0, 5, PDF::getAliasNumPage().'/'.PDF::getAliasNbPages(), 0, false, 'R', 0, '', 0, false, 'T', 'M');
 		
-		// PDF::SetFont('Times', 'B', 16, '', true);		
-		// PDF::SetY(11);	
-		// PDF::Cell(0, 5, 'Asia Kangnam Co.,Ltd.', 0, false, 'C', 0, '', 0, false, 'M', 'M');
-		// PDF::Ln(7);
-		// PDF::SetFont('Times', 'B', 14, '', true);	
-		// PDF::Cell(0, 5, 'Sending', 0, false, 'C', 0, '', 0, false, 'M', 'M');
-		//
-
-		//style texst
-		$styleText = array(
-			'position' => '',
-			'align' => 'C',
-			'stretch' => false,
-			'fitwidth' => true,
-			'cellfitalign' => '',
-			'border' => false,
-			'hpadding' => 'auto',
-			'vpadding' => 'auto',
-			'fgcolor' => array(0,0,0),
-			'bgcolor' => false, //array(255,255,255),
-			'text' => false,
-			'font' => 'helvetica',
-			'fontsize' => 8,
-			'stretchtext' => 3
-		);
-
 		$html = '';
 		$row_no = 1; $rowPerPage=0;
 
@@ -308,178 +277,160 @@ class OssServiceDataController extends Controller
 		$yRowHeight=6;
 		$yRowHeight2=12;
 
-		$x=5;		
-		$y=5;
+		$x=0;		
+		$y=10;
 			
 		$isBorder = 1;
-		$pdf::writeHTMLCell(200, $yHeight, $x, $y, '<b>รายงานผลการดำเนินงานศูนย์บริการแบบเบ็ดเสร็จของ บก.ทท.</b>', $border = 0, $ln = 0, $fill = 0, $reseth = true, $align = 'C', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M' );
+		$pdf::writeHTMLCell(210, $yHeight, $x, $y, '<b>รายงานผลการดำเนินงานศูนย์บริการแบบเบ็ดเสร็จของ บก.ทท. ประจำวันที่ </b>'.$date_str, $border = 0, $ln = 0, $fill = 0, $reseth = true, $align = 'C', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M' );
 		$y+=$yHeight;
 
+		PDF::Ln();
+		$rowPerPage=0;
+		$row_topic=1;
+		$prev_name="";
+		$count_1=$count_2=$count_3=0;
+		$total_count_1=$total_count_2=$total_count_3=0;
+		$net_count=0;
+        if($rowPerPage==0){
+             $html ='
+            <table class="table table-striped no-margin" border="1" style="padding: 1px;" >
+                 <thead>   
+                	<tr>
+	                    <th style="font-weight: bold; text-align: center; width: 30px; vertical-align: middle;" rowspan="2" >ลำดับ</th>
+	                    <th style="font-weight: bold; text-align: center; width: 400px;" rowspan="2" >เรื่อง</th>
+	                    <th style="font-weight: bold; text-align: center; width: 210px;" colspan="3" >จำนวนผู้ขอรับบริการ (ราย)</th>
+                	</tr>
+                	<tr>
+	                    <th style="font-weight: bold; text-align: center; width: 70px;" >ข้าราชการ ประจำการ</th>
+	                    <th style="font-weight: bold; text-align: center; width: 70px;" >ข้าราชการ บำนาญ</th>
+	                    <th style="font-weight: bold; text-align: center; width: 70px;" >ประชาชน ทั่วไป</th>
+                	</tr>
+                </thead>
+                <tbody>
+            '; 
+        } // rowPerPage
 
-		$pdf::writeHTMLCell(12, $yHeight = 12, $x, $y, '<b>ลำดับ</b>', $border = 1, $ln = 0, $fill = 0, $reseth = true, $align = 'C', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M' );
-		$x+=12;
-		$pdf::writeHTMLCell(113, $yHeight = 12, $x, $y, '<b>เรื่อง</b>', $border = 1, $ln = 0, $fill = 0, $reseth = true, $align = 'C', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M' );
-		$x+=113;
+        foreach($service_types as $key => $service_type){
+         		//switch         	
+	         	switch($service_type->id){
+	         		case 1 : case 2 :
+	         		if($prev_name != "" && $prev_name != $service_type->service_type_name){
+		         		// print footer
+		         		$html .= '<tr>
+			         		<td colspan="2" style="text-align: center; font-weight: bold;">รวม</td>
+				     		<td style="text-align: center; font-weight: bold;">'.$this->toThaiNumber($total_count_1).'</td>
+				     		<td style="text-align: center; font-weight: bold;">'.$this->toThaiNumber($total_count_2).'</td>
+				     		<td style="text-align: center; font-weight: bold;">'.$this->toThaiNumber($total_count_3).'</td>
+			         	</tr>';
+			         	$html .= '<tr>
+			         		<td colspan="2" style="text-align: center; font-weight: bold;">รวม '.$prev_name.'</td>
+			         		<td colspan="3" style="text-align: center; font-weight: bold;">รวม '.$this->toThaiNumber($total_count_1+$total_count_2+$total_count_3).'</td>
+			         	</tr>';
+			         	$net_count+=($total_count_1+$total_count_2+$total_count_3);
 
-		$pdf::writeHTMLCell(75, $yHeight = 6, $x, $y, '<b>จำนวนผู้ขอรับบริการ (ราย)</b>', $border = 1, $ln = 0, $fill = 0, $reseth = true, $align = 'C', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M' );
-		
-		$y+=6;
-		$pdf::SetFont('freeserif', '', 8, '', true);
-		$pdf::writeHTMLCell(25, $yHeight = 6, $x, $y, '<b>ข้าราชการประจำการ</b>', $border = 1, $ln = 0, $fill = 0, $reseth = true, $align = 'C', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M' );
-		$x+=25;
+		         		$row_topic=1;
+		         		$count_1=$count_2=$count_3=0;
+						$total_count_1=$total_count_2=$total_count_3=0;
+		         	}
 
-		$pdf::SetFont('freeserif', '', 9, '', true);
-		$pdf::writeHTMLCell(25, $yHeight = 6, $x, $y, '<b>ข้าราชการบำนาญ</b>', $border = 1, $ln = 0, $fill = 0, $reseth = true, $align = 'C', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M' );		
-		$x+=25;
+		        	if($row_topic=1){
+		             $html .='<tr>
+		             	<td colspan="5" style="width: 640px; font-weight: bold;">&nbsp;ผลการดำเนินงาน'.$service_type->service_type_name.'
+		             	</td>
+		             </tr>';
+		         	}
+	         		foreach ($service_data as $key => $item) {
+	         			$count_1=$item->count_1;
+	         			$count_2=$item->count_2;
+	         			$count_3=$item->count_3;
 
-		$pdf::writeHTMLCell(25, $yHeight = 6, $x, $y, '<b>ประชาชนทั่วไป</b>', $border = 1, $ln = 0, $fill = 0, $reseth = true, $align = 'C', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M' );
-		$y+=$yHeight;
+			         	$html .= '<tr>
+			         		<td style=" width: 30px; text-align: center;">'.$this->toThaiNumber($row_topic).'</td>
+			         		<td style=" width: 400px;">'.$item->service_topic_name.'</td>
+			         		<td style=" width: 70px; text-align: center;">'.$this->toThaiNumber($count_1).'</td>
+			         		<td style=" width: 70px; text-align: center;">'.$this->toThaiNumber($count_2).'</td>
+			         		<td style=" width: 70px; text-align: center;">'.$this->toThaiNumber($count_3).'</td>
+			         	</tr>';
 
+			         	$row_topic+=1;
+			         	$prev_name=$service_type->service_type_name;
+						$total_count_1+=$count_1;
+						$total_count_2+=$count_2;
+						$total_count_3+=$count_3;
+		         	}
+		         	break;
 
-		$pdf::SetFont('freeserif', '', 12, '', true);
+	         		case 3 : 
+	         		foreach ($complains as $key => $item) {
+	         			if($prev_name != "" && $prev_name != $service_type->service_type_name){
+			         		// print footer
+			         		$html .= '<tr>
+				         		<td colspan="2" style="text-align: center; font-weight: bold;">รวม</td>
+					     		<td style="text-align: center; font-weight: bold;">'.$this->toThaiNumber($total_count_1).'</td>
+					     		<td style="text-align: center; font-weight: bold;">'.$this->toThaiNumber($total_count_2).'</td>
+					     		<td style="text-align: center; font-weight: bold;">'.$this->toThaiNumber($total_count_3).'</td>
+				         	</tr>';
+				         	$html .= '<tr>
+				         		<td colspan="2" style="text-align: center; font-weight: bold;">รวม '.$prev_name.'</td>
+				         		<td colspan="3" style="text-align: center; font-weight: bold;">รวม '.$this->toThaiNumber($total_count_1+$total_count_2+$total_count_3).'</td>
+				         	</tr>';
+				         	$net_count+=($total_count_1+$total_count_2+$total_count_3);
 
-		$is_prev_data = false;
-		$prev_name = '';
-		$total_count_1 = $total_count_2 = $total_count_3 = 0;
-		$net_count_1 = $net_count_2 = $net_count_3 = 0;
-		foreach ($service_types as $service_type){
+			         		$row_topic=1;
+			         		$count_1=$count_2=$count_3=0;
+							$total_count_1=$total_count_2=$total_count_3=0;
+			         	}
 
-			// Begin Total Row
-			if($is_prev_data){
-				$x=5;
-				$pdf::writeHTMLCell(125, $yHeight, $x, $y, '<b>รวม</b>', $border = 1, $ln = 0, $fill = 0, $reseth = true, $align = 'C', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M' );
-				$x+=125;
+			        	if($row_topic=1){
+			             $html .='<tr>
+			             	<td colspan="5" style="width: 640px; font-weight: bold;">&nbsp;ผลการดำเนินงาน'.$service_type->service_type_name.'
+			             	</td>
+			             </tr>';
+			         	}
 
-				$pdf::writeHTMLCell(25, $yHeight, $x, $y, '<b>'.$this->toThaiNumber($total_count_1).'</b>', $border = 1, $ln = 0, $fill = 0, $reseth = true, $align = 'C', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M' );
-				$x+=25;
-				$pdf::writeHTMLCell(25, $yHeight, $x, $y, '<b>'.$this->toThaiNumber($total_count_2).'</b>', $border = 1, $ln = 0, $fill = 0, $reseth = true, $align = 'C', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M' );
-				$x+=25;
-				$pdf::writeHTMLCell(25, $yHeight, $x, $y, '<b>'.$this->toThaiNumber($total_count_3).'</b>', $border = 1, $ln = 0, $fill = 0, $reseth = true, $align = 'C', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M' );
-				$y+=$yHeight;
+	         			$count_1=($item->customer_type_id==1?1:0);
+						$count_2=($item->customer_type_id==2?1:0);
+						$count_3=($item->customer_type_id==3?1:0);
 
-				$x=5;
-				$pdf::writeHTMLCell(125, $yHeight, $x, $y, '<b>รวม'.$prev_name.'</b>', $border = 1, $ln = 0, $fill = 0, $reseth = true, $align = 'C', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M' );
-				$x+=125;
+			         	$html .= '<tr>
+			         		<td style=" width: 30px; text-align: center;">'.$this->toThaiNumber($row_topic).'</td>
+			         		<td style=" width: 400px;">'.$item->remark.'</td>
+			         		<td style=" width: 70px; text-align: center;">'.$this->toThaiNumber($count_1).'</td>
+			         		<td style=" width: 70px; text-align: center;">'.$this->toThaiNumber($count_2).'</td>
+			         		<td style=" width: 70px; text-align: center;">'.$this->toThaiNumber($count_3).'</td>
+			         	</tr>';
 
-				$pdf::writeHTMLCell(75, $yHeight, $x, $y, '<b>'.$this->toThaiNumber($total_count_1+$total_count_2+$total_count_3).'</b>', $border = 1, $ln = 0, $fill = 0, $reseth = true, $align = 'C', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M' );
-				$y+=$yHeight;
-			} // end if 
-			// End Total Row
+			         	$row_topic+=1;
+			         	$prev_name=$service_type->service_type_name;
+						$total_count_1+=$count_1;
+						$total_count_2+=$count_2;
+						$total_count_3+=$count_3;
+		         	}
+         			break;         			
+	         	}
+         	
+        } // service_types
 
-			switch($service_type->id){
-				case 3 :
-				// Begin Row of Group
-				$x=5;
-				$pdf::writeHTMLCell(200, $yHeight, $x, $y, '<b>ผลการดำเนินงาน'.$service_type->service_type_name.'</b>', $border = 1, $ln = 0, $fill = 0, $reseth = true, $align = '', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M' );
-				$y+=$yHeight;
+        $html .= '<tr>
+     		<td colspan="2" style="text-align: center; font-weight: bold;">รวม</td>
+     		<td style="text-align: center; font-weight: bold;">'.$this->toThaiNumber($total_count_1).'</td>
+     		<td style="text-align: center; font-weight: bold;">'.$this->toThaiNumber($total_count_2).'</td>
+     		<td style="text-align: center; font-weight: bold;">'.$this->toThaiNumber($total_count_3).'</td>
+     	</tr>';
+     	$html .= '<tr>
+     		<td colspan="2" style="text-align: center; font-weight: bold;">รวม '.$prev_name.'</td>
+     		<td colspan="3" style="text-align: center; font-weight: bold;">รวม '.$this->toThaiNumber($total_count_1+$total_count_2+$total_count_3).'</td>
+     	</tr>';
+	    $net_count+=($total_count_1+$total_count_2+$total_count_3);
 
-				$total_count_1 = $total_count_2 = $total_count_3 = 0;
-				foreach ($complains as $item) {
-					$customer_type_1=($item->customer_type_id==1?1:0);
-					$customer_type_2=($item->customer_type_id==2?1:0);
-					$customer_type_3=($item->customer_type_id==3?1:0);
-					if($service_type->id==$item->service_type_id){
-						$x=5;
-						$pdf::writeHTMLCell(12, $yRowHeight2, $x, $y, $this->toThaiNumber($row_no), $border = 1, $ln = 0, $fill = 0, $reseth = true, $align = 'C', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M' );
-						$x+=12;
-						$pdf::writeHTMLCell(113, $yRowHeight2, $x, $y, $item->remark, $border = 1, $ln = 0, $fill = 0, $reseth = true, $align = '', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M' );
-						$x+=113;
-						$pdf::writeHTMLCell(25, $yRowHeight2, $x, $y, $this->toThaiNumber($customer_type_1), $border = 1, $ln = 0, $fill = 0, $reseth = true, $align = 'C', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M' );
-						$x+=25;
-						$pdf::writeHTMLCell(25, $yRowHeight2, $x, $y, $this->toThaiNumber($customer_type_2), $border = 1, $ln = 0, $fill = 0, $reseth = true, $align = 'C', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M' );
-						$x+=25;
-						$pdf::writeHTMLCell(25, $yRowHeight2, $x, $y, $this->toThaiNumber($customer_type_3), $border = 1, $ln = 0, $fill = 0, $reseth = true, $align = 'C', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M' );
-						$y+=$yRowHeight2;
+     	$html .= '<tr>
+     		<td colspan="2" style="text-align: center; font-weight: bold;">รวม ให้บริการของศูนย์เบ็ดเสร็จทั้งสิ้น</td>
+     		<td colspan="3" style="text-align: center; font-weight: bold;">รวม '.$this->toThaiNumber($net_count).'</td>
+     	</tr>';
 
-						$row_no +=1;
-						$total_count_1+=$customer_type_1;
-						$total_count_2+=$customer_type_2;
-						$total_count_3+=$customer_type_3;
-
-						$net_count_1+=$customer_type_1;
-						$net_count_2+=$customer_type_2;
-						$net_count_3+=$customer_type_3;
-					}
-
-					$html='';
-					$rowPerPage=0;
-					 $rowPerPage+=1; 
-
-				} // foreach
-				break;
-				default : // case 1 : case 2 :
-				
-				$total_count_1 = $total_count_2 = $total_count_3 = 0;
-				// Begin Row of Group
-				$x=5;
-				$pdf::writeHTMLCell(200, $yHeight, $x, $y, '<b>ผลการดำเนินงาน'.$service_type->service_type_name.'</b>', $border = 1, $ln = 0, $fill = 0, $reseth = true, $align = '', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M' );
-				$y+=$yHeight;
-
-				$row_no = 1;
-				foreach ($service_data as $item) {
-					if($service_type->id==$item->id){
-						$x=5;
-						$pdf::writeHTMLCell(12, $yRowHeight, $x, $y, $this->toThaiNumber($row_no), $border = 1, $ln = 0, $fill = 0, $reseth = true, $align = 'C', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M' );
-						$x+=12;
-						$pdf::writeHTMLCell(113, $yRowHeight, $x, $y, $item->service_topic_name, $border = 1, $ln = 0, $fill = 0, $reseth = true, $align = '', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M' );
-						$x+=113;
-						$pdf::writeHTMLCell(25, $yRowHeight, $x, $y, $this->toThaiNumber($item->count_1), $border = 1, $ln = 0, $fill = 0, $reseth = true, $align = 'C', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M' );
-						$x+=25;
-						$pdf::writeHTMLCell(25, $yRowHeight, $x, $y, $this->toThaiNumber($item->count_2), $border = 1, $ln = 0, $fill = 0, $reseth = true, $align = 'C', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M' );
-						$x+=25;
-						$pdf::writeHTMLCell(25, $yRowHeight, $x, $y, $this->toThaiNumber($item->count_3), $border = 1, $ln = 0, $fill = 0, $reseth = true, $align = 'C', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M' );
-						$y+=$yRowHeight;
-
-						$row_no +=1;
-						$total_count_1+=$item->count_1;
-						$total_count_2+=$item->count_2;
-						$total_count_3+=$item->count_3;
-
-						$net_count_1+=$item->count_1;
-						$net_count_2+=$item->count_2;
-						$net_count_3+=$item->count_3;
-					}
-
-					$html='';
-					$rowPerPage=0;
-					 $rowPerPage+=1; 
-
-				} // foreach
-			} // switch
-			
-			$is_prev_data = true;
-			$prev_name = $service_type->service_type_name;
-
-			$row_no=1;
-		}
-		
-		// Begin Total Row
-		if($is_prev_data){
-			$x=5;
-			$pdf::writeHTMLCell(125, $yHeight, $x, $y, '<b>รวม</b>', $border = 1, $ln = 0, $fill = 0, $reseth = true, $align = 'C', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M' );
-			$x+=125;
-
-			$pdf::writeHTMLCell(25, $yHeight, $x, $y, '<b>'.$this->toThaiNumber($total_count_1).'</b>', $border = 1, $ln = 0, $fill = 0, $reseth = true, $align = 'C', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M' );
-			$x+=25;
-			$pdf::writeHTMLCell(25, $yHeight, $x, $y, '<b>'.$this->toThaiNumber($total_count_2).'</b>', $border = 1, $ln = 0, $fill = 0, $reseth = true, $align = 'C', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M' );
-			$x+=25;
-			$pdf::writeHTMLCell(25, $yHeight, $x, $y, '<b>'.$this->toThaiNumber($total_count_3).'</b>', $border = 1, $ln = 0, $fill = 0, $reseth = true, $align = 'C', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M' );
-			$y+=$yHeight;
-
-			$x=5;
-			$pdf::writeHTMLCell(125, $yHeight, $x, $y, '<b>รวม'.$prev_name.'</b>', $border = 1, $ln = 0, $fill = 0, $reseth = true, $align = 'C', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M' );
-			$x+=125;
-
-			$pdf::writeHTMLCell(75, $yHeight, $x, $y, '<b>'.$this->toThaiNumber($total_count_1+$total_count_2+$total_count_3).'</b>', $border = 1, $ln = 0, $fill = 0, $reseth = true, $align = 'C', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M' );
-			$y+=$yHeight;
-		} // end if 
-
-		$x=5;
-		$pdf::writeHTMLCell(125, $yHeight, $x, $y, '<b>รวมให้บริการของศูนย์เบ็ดเสร็จทั้งสิ้น</b>', $border = 1, $ln = 0, $fill = 0, $reseth = true, $align = 'C', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M' );
-		$x+=125;
-
-		$pdf::writeHTMLCell(75, $yHeight, $x, $y, '<b>'.$this->toThaiNumber($net_count_1+$net_count_2+$net_count_3).'</b>', $border = 1, $ln = 0, $fill = 0, $reseth = true, $align = 'C', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M' );
-		$y+=$yHeight;
+     	$html .= '</tbody>
+            </table>';
+		PDF::writeHTMLCell(0, 0, '', '', $html, 0, 1, 0, true, '', true);
 		// End Total Row
 		// // Footer
 		// PDF::SetFont('THSarabun', '', 14, '', true);

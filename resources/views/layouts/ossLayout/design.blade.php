@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>ProjectName</title>
+    <title>ศูนย์บริการแบบเบ็ดเสร็จ บก.ทท.</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="all,follow">
@@ -14,6 +14,8 @@
     <script src="{{ asset('public/assets/libs/jquery/dist/jquery.min.js') }}"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+    <!-- <link href="{{ asset('public/fonts/thsarabunnew/thsarabunnew.css') }}" rel="stylesheet"> -->
 
     <!-- Bootstrap tether Core JavaScript -->
      <script src="{{ asset('public/assets/libs/popper.js/dist/umd/popper.min.js') }}"></script>
@@ -76,13 +78,13 @@
     </style>
 </head>
 <body>
-    @include('layouts.posLayout.sidebar')  
+    @include('layouts.ossLayout.sidebar')  
     <div class="page">
-    @include('layouts.posLayout.header')
+    @include('layouts.ossLayout.header')
 
     @yield('content')   
 
-    @include('layouts.posLayout.footer')
+    @include('layouts.ossLayout.footer')
 
     </div>      
 
