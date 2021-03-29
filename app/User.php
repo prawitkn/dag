@@ -57,93 +57,71 @@ class User extends Authenticatable
         // return false;
     }
 
-    public function isOnlineStoreSalesAdmin(){
-        $roles = DB::table('user_online_stores as a')->select('a.*'
+
+
+
+
+
+    public function isOneStopService(){
+        $role = DB::table('user_osses as a')->select('a.*'
         )
         ->where('a.status','=',1)
         ->where('a.user_id','=', Auth::user()->id)
-        ->where('a.group_id','=',3)->get();
+        ->first();
 
-        foreach ($roles as $role)
-        {
-            if ($role->group_id == 3)   // Sales Admin
-            {
-                return true;
-            }
-        }
+        if($role){ return true; }else{ return false; }
     }
 
-    public function isOnlineStoreCustomer(){
-        $roles = DB::table('user_online_stores as a')->select('a.*'
+
+
+
+
+
+
+
+
+
+    public function isDagSchool(){
+        $role = DB::table('user_dag_schools as a')->select('a.*'
         )
         ->where('a.status','=',1)
         ->where('a.user_id','=', Auth::user()->id)
-        ->where('a.group_id','=',4)->get();
+        ->first();
 
-        foreach ($roles as $role)
-        {
-            if ($role->group_id == 4)   // Sales Admin
-            {
-                return true;
-            }
-        }
+        if($role){ return true; }else{ return false; }
     }
 
 
 
 
-	public function isSalesDashboard(){
-        return $this->is_sales_dashboard == 1;
-    }
 
-    public function isPos(){
-        $roll = DB::table('user_pos as a')->select('a.*'
-        )
-        ->where('a.status','=',1)
-        ->where('a.user_id','=', Auth::user()->id)->first();
 
-        if($roll){
-            return true;
-        }else{
-            return false;
-        }
-    }
 
-    public function isOnlineStore(){
-        $roll = DB::table('user_online_stores as a')->select('a.*'
-        )
-        ->where('a.status','=',1)
-        ->where('a.user_id','=', Auth::user()->id)->first();
 
-        if($roll){
-            return true;
-        }else{
-            return false;
-        }
-    }
 
-    public function isOnlineStoreAdmin(){
-        $roll = DB::table('user_online_stores as a')->select('a.*'
-        )
-        ->where('a.status','=',1)
-        ->where('a.user_id','=', Auth::user()->id)
-        ->where('a.group_id','=',1)->first();
 
-        if($roll){
-            return true;
-        }else{
-            return false;
-        }
-    }
 
-    public function getPosRoll(){
-        $rolls = DB::table('user_pos_groups as a')->select('a.*'
-        ,'b.id as pos_user_id'
-        )
-        ->leftjoin('user_pos as b','b.group_id','=','a.id')
-        ->where('a.status','=',1)
-        ->where('b.user_id','=', Auth::user()->id)->get();
 
-        return $rolls;
-    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

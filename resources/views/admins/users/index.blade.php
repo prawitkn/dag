@@ -51,7 +51,7 @@
     <!-- Page Header-->
     <header> 
       <h1 class="display">User List
-	  &nbsp;<a href="{{ url('admin/users2/new') }}" class="btn btn-primary shadow rounded" name="btn_add_product" /> New</a>
+	  &nbsp;<a href="{{ url('admin/users/new') }}" class="btn btn-primary shadow rounded" name="btn_add_product" /> New</a>
       </h1>
       
 
@@ -111,7 +111,7 @@ $(document).ready(function(){
                 fixedHeader: true,
                 ajax: {
                     type: 'GET',
-                    url: "{{ url('admin/users2/list') }}",
+                    url: "{{ url('admin/users/list') }}",
                     dataSrc: 'items',
                 },
                 autoWidth: false,
@@ -145,7 +145,7 @@ $(document).ready(function(){
                      },
                     {   targets: 'col_action',
                          render: function (data, type, row, meta) {
-                            return '<a name="" href="{{ url('admin/users2/edit/') }}/'+row.id+'" class="btn btn-primary btn-mini" data-ref_id="'+row.id+'" href="#" ><i class="fa fa-edit"></i> Edit</a>';
+                            return '<a name="" href="{{ url('admin/users/edit/') }}/'+row.id+'" class="btn btn-primary btn-mini" data-ref_id="'+row.id+'" href="#" ><i class="fa fa-edit"></i> Edit</a>';
                          }
                      }
                 ]

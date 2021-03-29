@@ -12,12 +12,15 @@
 */
 Auth::routes();
 
-Route::get('','DagController@index');
-Route::get('dag_school','DagsController@index');
 
+Route::get('dag_school/program_class/{id}','DagsController@program_class');
 
 Route::get('dag_school/reports/get-student_summary_list_by_class_id','DagsReportController@getStudentSummaryList');
+
 Route::group(['middleware' => 'auth'], function(){
+	Route::get('','DagController@index');
+
+	Route::get('dag_school','DagsController@index');
 	// Route::get('dag_school','DagSchoolReportController@index');
 	// Route::get('dag_school/get-student_summary_list_by_class_id','DagSchoolController@getStudentSummaryList');
 	// Route::get('/dag_school','DagSchoolController@index');
@@ -139,4 +142,34 @@ Route::group(['middleware' => 'auth'], function(){
 	Route::get('oss/service-data/report','OssServiceDataController@view_report');
 	Route::get('oss/service-data/get-report_summary','OssServiceDataController@report_summary');
 	Route::get('oss/service-data/get-report_summary_pdf','OssServiceDataController@report_summary_pdf');
+
+
+
+
+
+
+
+
+	Route::get('/change-pw','UserController@changePassword');
+	Route::post('/update-pw','UserController@changePassword');
+
+	// Admin	
+	Route::get('/admin','AdminController@listUsers');
+	Route::get('/admin/list-users','AdminController@UserListView');
+	Route::post('/admin/add-user_ajax','UserController@addUserAjax');
+	Route::post('/admin/edit-reset_pw_ajax','AdminController@resetPasswordAjax');
+	Route::get('/admin/get-user/{user_id}','UserController@getUser');
+	Route::post('/admin/edit-user_ajax','UserController@editUserAjax');
+	Route::get('/userJson', 'UserController@JSONUser')->name('userJson');
+	
+	// Admin
+	Route::get('admin','AdminController@dashboard');
+
+	// User
+	Route::get('admin/users/view-list','AdminController@UserListView');
+	Route::get('admin/users/list','AdminController@UserList');
+	Route::get('admin/users/new','AdminController@UserNewView');
+	Route::post('admin/users/create','AdminController@UserCreate')->name('user2Create');
+	Route::get('admin/users/edit/{id}','AdminController@UserEditView');
+	Route::post('admin/users/update','AdminController@UserUpdate')->name('userUpdate');
 });

@@ -34,6 +34,8 @@ class DagSchoolController extends Controller
         	return view('dag_school.dashboard')->with(compact('mytime'));
         }
     }
+
+    
     
     public function getStudentSummaryList(Request $req){
         $res = [];     

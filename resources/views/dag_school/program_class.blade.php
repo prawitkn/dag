@@ -30,43 +30,12 @@
 
 <section>
   <div class="container-fluid">
-     @if(Session::has('flash_message_error'))
-          <div class="alert alert-danger alert-block">
-              <button type="button" class="close" data-dismiss="alert">×</button> 
-                  <strong>{!! session('flash_message_error') !!}</strong>
-          </div>
-      @endif
-      
-      @if(Session::has('flash_message_success'))
-          <div class="alert alert-success alert-block">
-              <button type="button" class="close" data-dismiss="alert">×</button> 
-                  <strong>{!! session('flash_message_success') !!}</strong>
-          </div>
-      @endif
-
-
     <!-- Page Header-->
     <header> 
-      <h3 class="display">หน้าแรก
+      <h3 class="display">{{ $program_class->program_class_name }} 
       </h3>
-      
-
     </header>
     <!-- Page Header-->
-
-      <form id="frm1">
-    <div class="row">
-      <div class="col-md-12">
-        <select name="program_class_name" class="form-control">
-          <option value=""> - Select - </option>
-          @foreach($program_classes as $val)
-            <option value="{{$val->id}}">{{$val->program_class_name}}</option>
-          @endforeach
-        </select>
-        <input type="hidden" name="program_class_id" value="" />
-      </div>
-    </div>
-    </form>
 
      <!-- Table -->
       <div class="table-responsive">
@@ -86,13 +55,6 @@
         </table>
       </div>
       <!--/.table-responsive-->
-
-      <footer>
-          &nbsp;<a target="_blank" name="btn_pdf" class="btn btn-sm btn-primary shadow rounded text-white" > นำออก PDF</a>
-          &nbsp;<a target="_blank" name="btn_certificate" class="btn btn-sm btn-primary shadow rounded text-white" > ใบประกาศ</a>
-
-          
-      </footer>
   </div>
   <!--/.container-fluid-->
 </section>
@@ -189,9 +151,9 @@ $(document).ready(function(){
                 fixedHeader: true,
                 ajax: {
                     type: 'GET',
-                  url: "{{ url('/dag_school/get-student_summary_list_by_class_id/') }}",
+                  url: "{{ url('/dag_school/reports/get-student_summary_list_by_class_id/') }}",
                     data: {
-                        program_class_id: function() { return $('input[name="program_class_id"]').val() },
+                        program_class_id: {{ $program_class->id }},
                     },
                     dataSrc: 'items',
                 },
@@ -203,12 +165,21 @@ $(document).ready(function(){
                     { data: 'org_name' },
                     { data: null },
                 ],                
-        columnDefs: [                     
+                columnDefs: [                     
                      {   targets: 'col_no',
                       width: 20,
                         className: 'dt-center',
                          render: function (data, type, row, meta) {
-                            return meta.row+1;
+                            var row_no = meta.row+1;
+                            var tmp ='0'+row_no;
+                            tmp = tmp.substr(tmp.length - 2);
+                            switch(row_no){
+                              case 1 : return '<input type="hidden" value="'+tmp+'" /><span style="font-size: 190%">'+row_no+'</span>'; break;
+                              case 2 : return '<input type="hidden" value="'+tmp+'" /><span style="font-size: 150%">'+row_no+'</span>'; break;
+                              case 3 : return '<input type="hidden" value="'+tmp+'" /><span style="font-size: 130%">'+row_no+'</span>'; break;
+                              default : 
+                                return '<input type="hidden" value="'+tmp+'" /><span style="font-size: 100%">'+row_no+'</span>';;
+                            }
                          }
                      },    
                      {   targets: 'col_img',
@@ -220,11 +191,43 @@ $(document).ready(function(){
                             return tmp;
                          }
                      },     
+                     {   targets: 'col_name',
+                         render: function (data, type, row, meta) {
+                            var row_no = meta.row+1;
+                            switch(row_no){
+                              case 1 : return '<span style="font-size: 190%">'+row.student_name+'</span>'; break;
+                              case 2 : return '<span style="font-size: 150%">'+row.student_name+'</span>'; break;
+                              case 3 : return '<span style="font-size: 130%">'+row.student_name+'</span>'; break;
+                              default : 
+                                return '<span style="font-size: 100%">'+row.student_name+'</span>';;
+                            }
+                         }
+                     },    
+                     {   targets: 'col_org',
+                        className: 'dt-center',
+                         render: function (data, type, row, meta) {
+                            var row_no = meta.row+1;
+                            switch(row_no){
+                              case 1 : return '<span style="font-size: 190%">'+row.org_name+'</span>'; break;
+                              case 2 : return '<span style="font-size: 150%">'+row.org_name+'</span>'; break;
+                              case 3 : return '<span style="font-size: 130%">'+row.org_name+'</span>'; break;
+                              default : 
+                                return '<span style="font-size: 100%">'+row.org_name+'</span>';;
+                            }
+                         }
+                     },    
                      {   targets: 'col_score',
                         width: 100,
                         className: 'dt-center',
                          render: function (data, type, row, meta) {
-                            return number_format(row.net_score*100,2,'.',',');
+                            var row_no = meta.row+1;
+                            switch(row_no){
+                              case 1 : return '<span style="font-size: 190%">'+number_format(row.net_score*100,2,'.',',')+'</span>'; break;
+                              case 2 : return '<span style="font-size: 150%">'+number_format(row.net_score*100,2,'.',',')+'</span>'; break;
+                              case 3 : return '<span style="font-size: 130%">'+number_format(row.net_score*100,2,'.',',')+'</span>'; break;
+                              default : 
+                                return '<span style="font-size: 100%">'+number_format(row.net_score*100,2,'.',',')+'</span>';;
+                            }
                          }
                      },    
                 ]
@@ -233,23 +236,6 @@ $(document).ready(function(){
     } //.getList()
 
     getList();
-
-  $('select[name="program_class_name"]').change(function(e){ 
-      $('input[name="program_class_id"]').val($('select[name="program_class_name"] option').filter(":selected").val());  
-    getList();
-  }); // change
-
-  $('a[name="btn_pdf"]').click(function(){
-      window.open( "{{ url('dag_school/student-summary-pdf') }}" + '?type=date&' + $('#frm1').serialize(), 'Blank' );
-  });
-
-  $('a[name="btn_certificate"]').click(function(){
-      window.open( "{{ url('dag_school/student-certificate-pdf') }}" + '?type=date&' + $('#frm1').serialize(), 'Blank' );
-  });
-
-  $('a[name="btn_view"]').click(function(){
-      window.open( "{{ url('dag_school/program_class') }}" + '/'+$('input[name="program_class_id"]').val(), 'Blank' );
-  });
   
 });
 </script>

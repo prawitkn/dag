@@ -89,6 +89,7 @@
       <footer>
           &nbsp;<a target="_blank" name="btn_pdf" class="btn btn-sm btn-primary shadow rounded text-white" > นำออก PDF</a>
           &nbsp;<a target="_blank" name="btn_certificate" class="btn btn-sm btn-primary shadow rounded text-white" > ใบประกาศ</a>
+          &nbsp;<a target="_blank" name="btn_view" class="btn btn-sm btn-primary shadow rounded text-white" > View Public</a>
       </footer>
   </div>
   <!--/.container-fluid-->
@@ -244,6 +245,9 @@ $(document).ready(function(){
       window.open( "{{ url('dag_school/reports/student-certificate-pdf') }}" + '?type=date&' + $('#frm1').serialize(), 'Blank' );
   });
   
+  $('a[name="btn_view"]').click(function(){
+      window.open( "{{ url('dag_school/program_class') }}" + '/'+$('input[name="program_class_id"]').val(), 'Blank' );
+  });
 });
 </script>
 

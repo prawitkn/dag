@@ -90,38 +90,24 @@
 
             <div class="row">
               <div class="form-group col-md-3">
-                <input type="checkbox" name="is_user_pos" id="is_user_pos" data-toggle="toggle" data-size="mini" 
-                @if( $user->pos_status == 1 ) checked @endif
+                <input type="checkbox" name="is_user_oss" id="is_user_oss" data-toggle="toggle" data-size="mini" 
+                @if( $user->oss_status == 1 ) checked @endif
                 >
-                POS 
+                ระบบบันทึกข้อมูลการให้บริการศูนย์บริการแบบเบ็ดเสร็จ 
                 
               </div><!--/.col-->
 
               <div class="form-group col-md-3">
                 <label for="password">Group : </label>
-                <input type="hidden" name="pos_group_id" value="{{ $user->pos_group_id }}" />
-                <select name="pos_group_name" id="pos_group_name" class="form-control">
+                <input type="hidden" name="oss_group_id" value="{{ $user->oss_group_id }}" />
+                <select name="oss_group_name" id="oss_group_name" class="form-control">
                     <option value="">-</option>
-                    @foreach($pos_groups as $val)
+                    @foreach($oss_groups as $val)
                     <option value="{{ $val->id }}"
-                        @if($val->id==$user->pos_group_id) selected @endif 
+                        @if($val->id==$user->oss_group_id) selected @endif 
                         >{{ $val->group_name }}</option>
                     @endforeach
                 </select>
-              </div><!--/.col-->
-
-              <div class="form-group col-md-3">
-                <label for="password">Branch : </label>
-                <input type="hidden" name="pos_branch_id" value="{{ $user->pos_branch_id }}" />
-                <select name="pos_branch_name" id="pos_branch_name" class="form-control">
-                    <option value="">-</option>
-                    @foreach($pos_branches as $val)
-                    <option value="{{ $val->id }}"
-                        @if($val->id==$user->pos_branch_id) selected @endif 
-                        >{{ $val->branch_code }}</option>
-                    @endforeach
-                </select>
-               
               </div><!--/.col-->
 
             </div><!--/row-->
@@ -129,38 +115,24 @@
 
             <div class="row">
               <div class="form-group col-md-3">
-                <input type="checkbox" name="is_user_online_store" id="is_user_online_store" data-toggle="toggle" data-size="mini" 
-                @if( $user->online_store_status == 1 ) checked @endif
+                <input type="checkbox" name="is_user_dag_school" id="is_user_dag_school" data-toggle="toggle" data-size="mini" 
+                @if( $user->dag_school_status == 1 ) checked @endif
                 >
-                Sales Order 
+                โปรแกรมการจัดการศึกษาหลักสูตรสายวิทยาการสารบรรณ บก.ทท.
                 
               </div><!--/.col-->
 
               <div class="form-group col-md-3">
                 <label for="password">Group : </label>
-                <input type="hidden" name="pos_group_id" value="{{ $user->pos_group_id }}" />
-                <select name="online_store_group_name" id="online_store_group_name" class="form-control">
+                <input type="hidden" name="dag_school_group_id" value="{{ $user->dag_school_group_id }}" />
+                <select name="dag_school_group_name" id="dag_school_group_name" class="form-control">
                     <option value="">-</option>
-                    @foreach($os_groups as $val)
+                    @foreach($oss_groups as $val)
                     <option value="{{ $val->id }}"
-                        @if($val->id==$user->online_store_group_id) selected @endif 
+                        @if($val->id==$user->dag_school_group_id) selected @endif 
                         >{{ $val->group_name }}</option>
                     @endforeach
                 </select>
-              </div><!--/.col-->
-
-              <div class="form-group col-md-3">
-                <label for="password">Customer : </label>
-                <input type="hidden" name="online_store_customer_id" value="{{ $user->online_store_customer_id }}" />
-                <select name="online_store_customer_name" id="online_store_customer_name" class="form-control">
-                    <option value="">-</option>
-                    @foreach($os_customers as $val)
-                    <option value="{{ $val->id }}"
-                        @if($val->id==$user->online_store_customer_id) selected @endif 
-                        >{{ $val->customer_name }}</option>
-                    @endforeach
-                </select>
-               
               </div><!--/.col-->
 
             </div><!--/row-->
@@ -235,14 +207,19 @@
 <script type="text/javascript">
 
 $(document).ready(function(){	
-  $('#is_user_pos').bootstrapToggle();
-  $('#is_user_pos').change(function() {
+  $('#is_user_oss').bootstrapToggle();
+  $('#is_user_oss').change(function() {
     if($(this).is(':checked')){
-      $('select[name="pos_group_name"]').prop('disabled','');
-      $('select[name="pos_branch_name"]').prop('disabled','');
+      $('select[name="oss_group_name"]').prop('disabled','');
     }else{
-      $('select[name="pos_group_name"]').prop('disabled',true);
-      $('select[name="pos_branch_name"]').prop('disabled',true);
+      $('select[name="oss_group_name"]').prop('disabled',true);
+    }
+  })
+  $('#is_user_dag_school').change(function() {
+    if($(this).is(':checked')){
+      $('select[name="dag_school_group_name"]').prop('disabled','');
+    }else{
+      $('select[name="dag_school_group_name"]').prop('disabled',true);
     }
   })
 
@@ -304,14 +281,18 @@ $(document).ready(function(){
     }); // click
 
 
-	$('select[name="pos_group_name"]').change(function(e){ 
-      $('input[name="pos_group_id"]').val($('select[name="pos_group_name"] option').filter(":selected").val());  
+	$('select[name="oss_group_name"]').change(function(e){ 
+      $('input[name="oss_group_id"]').val($('select[name="oss_group_name"] option').filter(":selected").val());  
     }); // change
 
-    $('select[name="pos_branch_name"]').change(function(e){ 
-      $('input[name="pos_branch_id"]').val($('select[name="pos_branch_name"] option').filter(":selected").val());  
+    $('select[name="oss_branch_name"]').change(function(e){ 
+      $('input[name="oss_branch_id"]').val($('select[name="oss_branch_name"] option').filter(":selected").val());  
     }); // change
 
+
+    $('select[name="dag_school_group_name"]').change(function(e){ 
+      $('input[name="dag_school_group_id"]').val($('select[name="dag_school_group_name"] option').filter(":selected").val());  
+    }); // change
 });
 
 </script>

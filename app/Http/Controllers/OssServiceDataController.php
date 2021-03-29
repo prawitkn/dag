@@ -197,49 +197,120 @@ class OssServiceDataController extends Controller
 
 		$service_types = OssServiceType::where('status','=',1)->get();
 
-		$service_data = DB::table('oss_service_types as a')
-		->join('oss_service_topics as b', function($join)
-             {
-                 $join->on('b.service_type_id','=','a.id');
-             })
-		->select('a.id', 'b.service_topic_name'
-			, DB::RAW("(SELECT COUNT(x.id) FROM oss_service_data as x 
-				WHERE x.status=1 
-				AND x.issue_date BETWEEN '".$issue_date_from."' AND '".$issue_date_to."'
-				AND x.service_topic_id=b.id
-				AND x.customer_type_id=1
-				) as count_1")
-			, DB::RAW("(SELECT COUNT(x.id) FROM oss_service_data as x 
-				WHERE x.status=1 
-				AND x.issue_date BETWEEN '".$issue_date_from."' AND '".$issue_date_to."'
-				AND x.service_topic_id=b.id
-				AND x.customer_type_id=2) as count_2")
-			, DB::RAW("(SELECT COUNT(x.id) FROM oss_service_data as x 
-				WHERE x.status=1 
-				AND x.issue_date BETWEEN '".$issue_date_from."' AND '".$issue_date_to."'
-				AND x.service_topic_id=b.id
-				AND x.customer_type_id=3) as count_3")
-		)
-		->where('a.status','=',1)
-		->where('a.id','<>',3)
-		// ->groupBy('a.service_type_id','a.service_topic_id','a.remark'
-		// 	,'b.service_type_name','c.service_topic_name')
-		->get();	
+		DB::statement(DB::raw( "CREATE TEMPORARY TABLE temp_rpt(
+			id int,
+			service_topic_id int,
+			service_topic_name varchar(191),
+			count_1 int,
+			count_2 int,
+			count_3 int
+		 )"));
 
-		$complains = DB::table('oss_service_types as a')
-		->join('oss_service_data as b', function($join) use ($issue_date_from, $issue_date_to)
-             {
-                 $join->on('b.service_type_id','=','a.id');
-                 $join->whereBetween('b.issue_date', [$issue_date_from, $issue_date_to]);
-             })
-		->select('a.id'
-			,'b.service_type_id','b.customer_type_id', 'b.remark'
-		)
-		->where('a.status','=',1)
-		->where('a.id','=',3)
-		// ->groupBy('a.service_type_id','a.service_topic_id','a.remark'
-		// 	,'b.service_type_name','c.service_topic_name')
-		->get();	
+		DB::statement(DB::raw( "INSERT INTO temp_rpt (id, service_topic_id, service_topic_name)  
+			SELECT a.id, b.id, b.service_topic_name 
+			FROM oss_service_types as a 
+			JOIN oss_service_topics as b ON b.service_type_id=a.id 
+				AND b.status=1 
+			WHERE a.status=1 
+			AND a.id <> 3 
+		 "));
+
+		DB::statement(DB::raw( "UPDATE temp_rpt as a
+			SET a.count_1 = (SELECT COUNT(x.id) FROM oss_service_data as x 
+					WHERE x.status=1 
+					AND x.issue_date BETWEEN '".$issue_date_from."' AND '".$issue_date_to."'
+					AND x.service_type_id=a.id 
+					AND x.service_topic_id=a.service_topic_id
+					AND x.customer_type_id=1
+					),
+			a.count_2 = (SELECT COUNT(x.id) FROM oss_service_data as x 
+					WHERE x.status=1 
+					AND x.issue_date BETWEEN '".$issue_date_from."' AND '".$issue_date_to."'
+					AND x.service_type_id=a.id 
+					AND x.service_topic_id=a.service_topic_id
+					AND x.customer_type_id=2
+					),
+			a.count_3 = (SELECT COUNT(x.id) FROM oss_service_data as x 
+					WHERE x.status=1 
+					AND x.issue_date BETWEEN '".$issue_date_from."' AND '".$issue_date_to."'
+					AND x.service_type_id=a.id 
+					AND x.service_topic_id=a.service_topic_id
+					AND x.customer_type_id=3
+					)
+		 "));
+
+		$service_data = DB::table('temp_rpt')->get();
+
+		// $service_data = DB::table('oss_service_types as a')
+		// ->join('oss_service_topics as b', function($join)
+  //            {
+  //                $join->on('b.service_type_id','=','a.id');
+  //            })
+		// ->select('a.id', 'b.service_topic_name'
+		// 	, DB::RAW("(SELECT COUNT(x.id) FROM oss_service_data as x 
+		// 		WHERE x.status=1 
+		// 		AND x.issue_date BETWEEN '".$issue_date_from."' AND '".$issue_date_to."'
+		// 		AND x.service_type_id=a.id 
+		// 		AND x.service_topic_id=b.id
+		// 		AND x.customer_type_id=1
+		// 		) as count_1")
+		// 	, DB::RAW("(SELECT COUNT(x.id) FROM oss_service_data as x 
+		// 		WHERE x.status=1 
+		// 		AND x.issue_date BETWEEN '".$issue_date_from."' AND '".$issue_date_to."'
+		// 		AND x.service_type_id=a.id 
+		// 		AND x.service_topic_id=b.id
+		// 		AND x.customer_type_id=2) as count_2")
+		// 	, DB::RAW("(SELECT COUNT(x.id) FROM oss_service_data as x 
+		// 		WHERE x.status=1 
+		// 		AND x.issue_date BETWEEN '".$issue_date_from."' AND '".$issue_date_to."'
+		// 		AND x.service_type_id=a.id 
+		// 		AND x.service_topic_id=b.id
+		// 		AND x.customer_type_id=3) as count_3")
+		// )
+		// ->where('a.status','=',1)
+		// ->where('a.id','<>',3)
+		// // ->groupBy('a.service_type_id','a.service_topic_id','a.remark'
+		// // 	,'b.service_type_name','c.service_topic_name')
+		// ->get();	
+
+
+
+
+		DB::statement(DB::raw( "CREATE TEMPORARY TABLE temp_complains(
+			id int,
+			service_type_id int,
+			service_type_name varchar(191),
+			customer_type_id int,
+			remark varchar(250)
+		 )"));
+
+		DB::statement(DB::raw( "INSERT INTO temp_complains (id, service_type_id, service_type_name, customer_type_id, remark)  
+			SELECT b.id, a.id, a.service_type_name, b.customer_type_id, b.remark 
+			FROM oss_service_types as a 
+			JOIN oss_service_data as b ON b.service_type_id = a.id 
+				AND b.issue_date BETWEEN '".$issue_date_from."' AND '".$issue_date_to."' 
+				AND b.status=1 
+			WHERE a.status=1 
+			AND a.id = 3 
+		 "));
+
+		$complains = DB::table('temp_complains')->get();
+		// dd($complains);
+
+		// $complains = DB::table('oss_service_types as a')
+		// ->join('oss_service_data as b', function($join) use ($issue_date_from, $issue_date_to)
+  //            {
+  //                $join->on('b.service_type_id','=','a.id');
+  //                $join->whereBetween('b.issue_date', [$issue_date_from, $issue_date_to]);
+  //            })
+		// ->select('a.id'
+		// 	,'b.service_type_id','b.customer_type_id', 'b.remark'
+		// )
+		// ->where('a.status','=',1)
+		// ->where('a.id','=',3)
+		// // ->groupBy('a.service_type_id','a.service_topic_id','a.remark'
+		// // 	,'b.service_type_name','c.service_topic_name')
+		// ->get();	
 			
 		$size = 'A4'; // array(200,  100);
 		$pdf = new PDF('P', 'mm', $size, true, 'UTF-8', false);
@@ -281,7 +352,7 @@ class OssServiceDataController extends Controller
 		$y=10;
 			
 		$isBorder = 1;
-		$pdf::writeHTMLCell(210, $yHeight, $x, $y, '<b>รายงานผลการดำเนินงานศูนย์บริการแบบเบ็ดเสร็จของ บก.ทท. ประจำวันที่ </b>'.$date_str, $border = 0, $ln = 0, $fill = 0, $reseth = true, $align = 'C', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M' );
+		$pdf::writeHTMLCell(210, $yHeight, $x, $y, '<b>รายงานผลการดำเนินงานศูนย์บริการแบบเบ็ดเสร็จของ บก.ทท. ประจำวันที่ '.$date_str.'</b>', $border = 0, $ln = 0, $fill = 0, $reseth = true, $align = 'C', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M' );
 		$y+=$yHeight;
 
 		PDF::Ln();
@@ -333,60 +404,82 @@ class OssServiceDataController extends Controller
 						$total_count_1=$total_count_2=$total_count_3=0;
 		         	}
 
-		        	if($row_topic=1){
+		        	if ($row_topic=1){
 		             $html .='<tr>
 		             	<td colspan="5" style="width: 640px; font-weight: bold;">&nbsp;ผลการดำเนินงาน'.$service_type->service_type_name.'
 		             	</td>
 		             </tr>';
 		         	}
 	         		foreach ($service_data as $key => $item) {
-	         			$count_1=$item->count_1;
-	         			$count_2=$item->count_2;
-	         			$count_3=$item->count_3;
+	         			if ($service_type->id == $item->id) {
+	         				$count_1=$item->count_1;
+		         			$count_2=$item->count_2;
+		         			$count_3=$item->count_3;
 
-			         	$html .= '<tr>
-			         		<td style=" width: 30px; text-align: center;">'.$this->toThaiNumber($row_topic).'</td>
-			         		<td style=" width: 400px;">'.$item->service_topic_name.'</td>
-			         		<td style=" width: 70px; text-align: center;">'.$this->toThaiNumber($count_1).'</td>
-			         		<td style=" width: 70px; text-align: center;">'.$this->toThaiNumber($count_2).'</td>
-			         		<td style=" width: 70px; text-align: center;">'.$this->toThaiNumber($count_3).'</td>
-			         	</tr>';
+				         	$html .= '<tr>
+				         		<td style=" width: 30px; text-align: center;">'.$this->toThaiNumber($row_topic).'</td>
+				         		<td style=" width: 400px;">'.$item->service_topic_name.'</td>
+				         		<td style=" width: 70px; text-align: center;">'.$this->toThaiNumber($count_1).'</td>
+				         		<td style=" width: 70px; text-align: center;">'.$this->toThaiNumber($count_2).'</td>
+				         		<td style=" width: 70px; text-align: center;">'.$this->toThaiNumber($count_3).'</td>
+				         	</tr>';
 
-			         	$row_topic+=1;
-			         	$prev_name=$service_type->service_type_name;
-						$total_count_1+=$count_1;
-						$total_count_2+=$count_2;
-						$total_count_3+=$count_3;
+				         	$row_topic+=1;
+				         	$prev_name=$service_type->service_type_name;
+							$total_count_1+=$count_1;
+							$total_count_2+=$count_2;
+							$total_count_3+=$count_3;
+	         			}
+	         			
 		         	}
 		         	break;
 
 	         		case 3 : 
+	         		// print footer 1, 2 service_type_id 
+	         		$html .= '<tr>
+		         		<td colspan="2" style="text-align: center; font-weight: bold;">รวม</td>
+			     		<td style="text-align: center; font-weight: bold;">'.$this->toThaiNumber($total_count_1).'</td>
+			     		<td style="text-align: center; font-weight: bold;">'.$this->toThaiNumber($total_count_2).'</td>
+			     		<td style="text-align: center; font-weight: bold;">'.$this->toThaiNumber($total_count_3).'</td>
+		         	</tr>';
+		         	$html .= '<tr>
+		         		<td colspan="2" style="text-align: center; font-weight: bold;">รวม '.$prev_name.'</td>
+		         		<td colspan="3" style="text-align: center; font-weight: bold;">รวม '.$this->toThaiNumber($total_count_1+$total_count_2+$total_count_3).'</td>
+		         	</tr>';
+		         	$net_count+=($total_count_1+$total_count_2+$total_count_3);
+
+	         		$row_topic=1;
+	         		$count_1=$count_2=$count_3=0;
+					$total_count_1=$total_count_2=$total_count_3=0;
+
+
+	         		if($row_topic=1){
+		             $html .='<tr>
+		             	<td colspan="5" style="width: 640px; font-weight: bold;">&nbsp;ผลการดำเนินงาน'.$service_type->service_type_name.'
+		             	</td>
+		             </tr>';
+		         	}
 	         		foreach ($complains as $key => $item) {
-	         			if($prev_name != "" && $prev_name != $service_type->service_type_name){
-			         		// print footer
-			         		$html .= '<tr>
-				         		<td colspan="2" style="text-align: center; font-weight: bold;">รวม</td>
-					     		<td style="text-align: center; font-weight: bold;">'.$this->toThaiNumber($total_count_1).'</td>
-					     		<td style="text-align: center; font-weight: bold;">'.$this->toThaiNumber($total_count_2).'</td>
-					     		<td style="text-align: center; font-weight: bold;">'.$this->toThaiNumber($total_count_3).'</td>
-				         	</tr>';
-				         	$html .= '<tr>
-				         		<td colspan="2" style="text-align: center; font-weight: bold;">รวม '.$prev_name.'</td>
-				         		<td colspan="3" style="text-align: center; font-weight: bold;">รวม '.$this->toThaiNumber($total_count_1+$total_count_2+$total_count_3).'</td>
-				         	</tr>';
-				         	$net_count+=($total_count_1+$total_count_2+$total_count_3);
+	      //    			if($prev_name != "" && $prev_name != $service_type->service_type_name){
+			    //      		// print footer
+			    //      		$html .= '<tr>
+				   //       		<td colspan="2" style="text-align: center; font-weight: bold;">รวม</td>
+					  //    		<td style="text-align: center; font-weight: bold;">'.$this->toThaiNumber($total_count_1).'</td>
+					  //    		<td style="text-align: center; font-weight: bold;">'.$this->toThaiNumber($total_count_2).'</td>
+					  //    		<td style="text-align: center; font-weight: bold;">'.$this->toThaiNumber($total_count_3).'</td>
+				   //       	</tr>';
+				   //       	$html .= '<tr>
+				   //       		<td colspan="2" style="text-align: center; font-weight: bold;">รวม '.$prev_name.'</td>
+				   //       		<td colspan="3" style="text-align: center; font-weight: bold;">รวม '.$this->toThaiNumber($total_count_1+$total_count_2+$total_count_3).'</td>
+				   //       	</tr>';
+				   //       	$net_count+=($total_count_1+$total_count_2+$total_count_3);
 
-			         		$row_topic=1;
-			         		$count_1=$count_2=$count_3=0;
-							$total_count_1=$total_count_2=$total_count_3=0;
-			         	}
+			    //      		$row_topic=1;
+			    //      		$count_1=$count_2=$count_3=0;
+							// $total_count_1=$total_count_2=$total_count_3=0;
+			    //      	}
 
-			        	if($row_topic=1){
-			             $html .='<tr>
-			             	<td colspan="5" style="width: 640px; font-weight: bold;">&nbsp;ผลการดำเนินงาน'.$service_type->service_type_name.'
-			             	</td>
-			             </tr>';
-			         	}
+			        	
 
 	         			$count_1=($item->customer_type_id==1?1:0);
 						$count_2=($item->customer_type_id==2?1:0);

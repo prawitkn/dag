@@ -7,9 +7,8 @@ use Session;
 
 use Auth;
 use App\User;
-use App\UserPosGroup;
-use App\UserPos;
-use App\PosBranch;
+use App\UserOssGroup;
+use App\UserOss;
 
 
 use App\UserOnlineStoreGroup;
@@ -33,12 +32,12 @@ class AdminController extends Controller
 
 
 
-    public function User2ListView()
+    public function UserListView()
     {
-        return view('admins.users2.index');
+        return view('admins.users.index');
     }
 
-	public function User2List()
+	public function UserList()
     {
 		$res = [];		
 		// $materials = DB::table('users as a')->select('a.*'
@@ -58,12 +57,12 @@ class AdminController extends Controller
 		return $res;	
 	}
 	
-	public function User2NewView()
+	public function UserNewView()
     {
-		return view('admins.users2.new');
+		return view('admins.users.new');
     }
 
-	public function User2Create(Request $req){
+	public function UserCreate(Request $req){
 		$res = [];		
 		$user_id = Auth::user()->id;
         try{
@@ -94,31 +93,29 @@ class AdminController extends Controller
         return $res;
     }
 
-    public function User2EditView(Request $req, $id)
+    public function UserEditView(Request $req, $id)
     {
         // $user = User::find($id);
 
         // $user_pos = UserPos::where('user_id','=',$id)->first();
 
         $user = DB::table('users')->select('users.id', 'users.name', 'users.first_name', 'users.last_name', 'users.email' ,'users.status'
-            , 'user_pos.id as pos_user_id','user_pos.status as pos_status'
-            , 'user_pos.group_id as pos_group_id', 'c.group_name as pos_group_name'
-            , 'user_pos.branch_id as pos_branch_id', 'd.branch_code as pos_branch_code'
+            , 'user_osses.id as pos_user_id','user_osses.status as oss_status'
+            , 'user_osses.group_id as oss_group_id', 'c.group_name as oss_group_name'
+            , 'user_osses.branch_id as pos_branch_id'
 
-            , 'user_online_stores.status as online_store_status'
-            , 'user_online_stores.group_id as online_store_group_id'
-            , 'user_online_stores.customer_id as online_store_customer_id'
+            , 'user_dag_schools.status as dag_school_status'
+            , 'user_dag_schools.group_id as dag_school_group_id'
         )
-        ->leftjoin('user_pos', function($join)
+        ->leftjoin('user_osses', function($join)
              {
-                 $join->on('user_pos.user_id','=','users.id');
+                 $join->on('user_osses.user_id','=','users.id');
              })
-        ->leftjoin('user_pos_groups as c','c.id','=','user_pos.group_id')
-        ->leftjoin('pos_branches as d','d.id','=','user_pos.branch_id')
+        ->leftjoin('user_oss_groups as c','c.id','=','user_osses.group_id')
 
-        ->leftjoin('user_online_stores', function($join)
+        ->leftjoin('user_dag_schools', function($join)
              {
-                 $join->on('user_online_stores.user_id','=','users.id');
+                 $join->on('user_dag_schools.user_id','=','users.id');
              })
 
         ->where('users.status','=',1)
@@ -131,16 +128,13 @@ class AdminController extends Controller
         //     return view('admins.users2.index')->with(compact('users'));
         // }
 
-        $pos_groups = UserPosGroup::where('status','=',1)->get();
-        $pos_branches = PosBranch::where('status','=',1)->get();
+        $oss_groups = DB::table('user_oss_groups')->where('status','=',1)->get();
+        $dag_school_groups = DB::table('user_dag_school_groups')->where('status','=',1)->get();
 
-        $os_groups = UserOnlineStoreGroup::where('status','=',1)->get();
-        $os_customers = OsCustomer::where('status','=',1)->get();
-
-        return view('admins.users2.edit')->with(compact('user','pos_groups','pos_branches','os_groups','os_customers'));
+        return view('admins.users.edit')->with(compact('user','oss_groups','dag_school_groups'));
     }
 
-    public function User2Update(Request $req){
+    public function UserUpdate(Request $req){
         $res = [];      
         $user_id = Auth::user()->id;
         try{
@@ -162,27 +156,45 @@ class AdminController extends Controller
                     $user->save(); 
                 }else{
                     // Create 
-                    // $user = UserPos::create($user);
+
                 }
 
-                // POS
-                $user_pos = UserPos::where('user_id','=',$dt['id'])->first();
-                if($user_pos){
+                // OSS
+                $user_oss = UserOss::where('user_id','=',$dt['id'])->first();
+                if($user_oss){
                     // Update
-                    if($req->has('is_user_pos')) { $user_pos['status'] = 1;
-                        $user_pos['group_id'] = $req['pos_group_name'];
-                        $user_pos['branch_id'] = $req['pos_branch_name'];
-                    }else{ $user_pos['status'] = 0; }
+                    if($req->has('is_user_oss')) { $user_oss['status'] = 1;
+                        $user_oss['group_id'] = $req['pos_group_name'];
+                    }else{ $user_oss['status'] = 0; }
                     
-                    $user_pos['updated_by'] = $user_id;
-                    $user_pos->save(); 
+                    $user_oss['updated_by'] = $user_id;
+                    $user_oss->save(); 
                 }else{
                     // Create 
-                    $user_pos['user_id'] = $req['id'];
-                    $user_pos['status'] = ($dt['is_user_pos']?1:0);
-                    $user_pos['group_id'] = $req['pos_group_name'];
-                    $user_pos['branch_id'] = $req['pos_branch_name'];
-                    $user_pos = UserPos::create($user_pos);
+                    $user_oss['user_id'] = $req['id'];
+                    $user_oss['status'] = ($dt['is_user_oss']?1:0);
+                    $user_oss['group_id'] = $req['pos_group_name'];
+                    $user_oss['branch_id'] = $req['pos_branch_name'];
+                    $user_oss = UserOss::create($user_oss);
+                }
+
+                // OSS
+                $user_dag_school = UserDagSchool::where('user_id','=',$dt['id'])->first();
+                if($user_dag_school){
+                    // Update
+                    if($req->has('is_user_dag_school')) { $user_dag_school['status'] = 1;
+                        $user_dag_school['group_id'] = $req['pos_group_name'];
+                    }else{ $user_dag_school['status'] = 0; }
+                    
+                    $user_dag_school['updated_by'] = $user_id;
+                    $user_dag_school->save(); 
+                }else{
+                    // Create 
+                    $user_dag_school['user_id'] = $req['id'];
+                    $user_dag_school['status'] = ($dt['is_user_dag_school']?1:0);
+                    $user_dag_school['group_id'] = $req['pos_group_name'];
+                    $user_dag_school['branch_id'] = $req['pos_branch_name'];
+                    $user_dag_school = UserOss::create($user_dag_school);
                 }
                 
                 $res = [

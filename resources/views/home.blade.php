@@ -102,19 +102,34 @@
                 <pr>
 
                 <div class="row center">
+                    @if(Auth::user()->isOneStopService())
                 	<div class="row col-md-12  style="padding-top:3px; min-width: 18rem;">
                 		<a href="{{ url('/oss') }}" class="btn btn-outline-primary">
-                          <img style="height: 10rem;" src="{{ asset('public/assets/images/product-library-logo.jpg') }}" class="card-img-top" alt="...">
-                            &nbsp;<br/><label style="font-size: x-large;">OSS</label>  
+                          <img style="height: 10rem;" src="{{ asset('public/assets/images/oss.jpg') }}" class="card-img-top" alt="...">
+                            &nbsp;<br/><label style="font-size: x-large;">ศูนยบริการแบบเบ็ดเสร็จ</label>  
                           </a> 
                 	</div>
+                    @endif
 
+
+                    @if(Auth::user()->isDagSchool())
                 	<div class="row col-md-12  style="padding-top:3px; min-width: 18rem;">
                 		<a href="{{ url('/dag_school') }}" class="btn btn-outline-primary">
-                          <img style="height: 10rem;" src="{{ asset('public/assets/images/product-library-logo.jpg') }}" class="card-img-top" alt="...">
-                            &nbsp;<br/><label style="font-size: x-large;">School</label>  
+                          <img style="height: 10rem; width: 15rem;" src="{{ asset('public/assets/images/dag_school.jpg') }}" class="card-img-top" alt="...">
+                            &nbsp;<br/><label style="font-size: x-large;">ระบบการจัดการหลักสูตรสายวิทยาการสารบรรณ</label>  
                           </a> 
                 	</div>
+                    @endif
+
+
+                    @if(Auth::user()->isAdmin())
+                    <div class="row col-md-12  style="padding-top:3px; min-heigth: 15rem;  min-width: 18rem;">
+                        <a href="{{ url('/admin') }}" class="btn btn-outline-primary center">
+                          <img style="height: 10rem; width: 15rem;" src="{{ asset('public/assets/images/data.png') }}" class="card-img-top" alt="...">
+                            &nbsp;<br/><label style="font-size: x-large;">ข้อมูลหลัก</label>  
+                          </a> 
+                    </div>
+                    @endif
                 </div>
 
             </div>

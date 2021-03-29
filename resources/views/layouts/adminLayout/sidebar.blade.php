@@ -8,7 +8,7 @@
         <h2 class="h5">Prawit  Khamnet</h2><span>Web Developer</span>
       </div>
       <!-- Small Brand information, appears on minimized sidebar-->
-      <div class="sidenav-header-logo"><a href="index.html" class="brand-small text-center"> <strong>B</strong><strong class="text-primary">B</strong></a></div>
+      <div class="sidenav-header-logo"><a href="index.html" class="brand-small text-center"> <strong>A</strong><strong class="text-primary">M</strong></a></div>
     </div>
     <!-- Sidebar Navigation Menus-->
     <div class="main-menu">
@@ -18,8 +18,7 @@
       <h5 class="sidenav-heading">Menu</h5>
 
       <ul id="side-main-menu" class="side-menu list-unstyled">                  
-        <li><a href="{{ url('/admin/users2/view-list') }}"><i class="icon-user"></i>User</a></li>
-        <li> <a href="{{ url('admin/product_categories/view-list') }}"><i class="icon-screen"></i>ข้อมูลประเภทสินค้า</a></li>
+        <li><a href="{{ url('/admin/users/view-list') }}"><i class="icon-user"></i>User</a></li>
       </ul>             
       
     </div>

@@ -263,7 +263,6 @@ $(document).ready(function(){
      $('select[name="customer_type_name"]').on('change', function() { 
       // alert($(this).val());
       $('input[name="customer_type_id"]').val($(this).val());
-      $('input[name="service_topic_id"]').val('');
     });
 });
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Auth;
 
 class DagController extends Controller
 {
@@ -23,6 +24,8 @@ class DagController extends Controller
      */
     public function index()
     {
+        // Auth::user()->isOneStopService();
+
         return view('home');
     }
 }
